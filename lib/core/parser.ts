@@ -16,13 +16,13 @@ export default class Parser {
 
     position: number;
     currentToken: Token;
-
+    
     stack: Stack;
     scope: Scope;
     linker: Scope;
     script: Scope;
 
-    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined,private parentScript: Scope | undefined = undefined ) {
+    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined,private parentScript: Scope | undefined = undefined ) {
         this.position = 0;
         this.currentToken = this.tokens[this.position]
         this.stack = new Stack()
@@ -184,7 +184,7 @@ export default class Parser {
             const tokenizer: Lexer = new Lexer(codeBlock, '', true);
             const tokens: Token[] = tokenizer.start();
 
-            const parser: Parser = new Parser(tokens, { [key]: e }, this.scope);
+            const parser: Parser = new Parser(tokens, { [key]: e }, this.__view, this.scope);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -246,7 +246,7 @@ export default class Parser {
 
             const titleTagIndex = html.indexOf('</title>');
 
-            const jsScriptTag = `\n<script src="${value}.js" defer/>`;
+            const jsScriptTag = `\n<script src="${value}.js" defer/></script>`;
 
             if (titleTagIndex !== -1) {
                 const insertPosition = titleTagIndex + '</title>'.length;
@@ -321,12 +321,12 @@ export default class Parser {
 
                             if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"\.\/.*"$/.test(this.currentToken?.value)) {
 
-                                const content: string = fs.readFileSync(path.resolve(process.cwd(), this.currentToken?.value.replace(`"`, "").replace(`"`, "")), "utf-8");
+                                const content: string = fs.readFileSync(path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")), "utf-8");
 
-                                const tokenizer: Lexer = new Lexer(content, path.resolve(process.cwd(), this.currentToken?.value.replace(`"`, "").replace(`"`, "")));
+                                const tokenizer: Lexer = new Lexer(content, path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")));
                                 const componentTokens: Token[] = tokenizer.start();
 
-                                const componentParser: Parser = new Parser(componentTokens, undefined, undefined, this.linker );
+                                const componentParser: Parser = new Parser(componentTokens, undefined, this.__view, undefined, this.linker );
 
                                 this.scope.define(componentName, componentParser);
                                 this.eat()
@@ -345,7 +345,7 @@ export default class Parser {
                         this.eat();
                         this.skipSpace();
 
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"\.\/.*"$/.test(this.currentToken?.value)) {
+                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"(\.?\/.*)"$/.test(this.currentToken?.value)) {
                             const cssPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
                             this.linker.parent ? this.linker.parent.define(cssName, cssPath) : this.linker.define(cssName, cssPath)
@@ -363,7 +363,7 @@ export default class Parser {
                         this.eat();
                         this.skipSpace();
 
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"\.\/.*"$/.test(this.currentToken?.value)) {
+                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"(\.?\/.*)"$/.test(this.currentToken?.value)) {
                             const jsPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
                             this.script.parent ? this.script.parent.define(jsName, jsPath) : this.script.define(jsName, jsPath)
@@ -473,7 +473,7 @@ export default class Parser {
                 this.stack.pop();
                 this.eat(); // Eat the closing tag
 
-                const slotParser = new Parser(slotTokens, this.parameters, this.scope);
+                const slotParser = new Parser(slotTokens, this.parameters, this.__view, this.scope);
                 const slotWithParameters = slotParser.htmlParser('');
 
                 componentParameters.slot = slotWithParameters;
@@ -618,7 +618,7 @@ export default class Parser {
         const tokenizer: Lexer = new Lexer(block, '', true);
         const tokens: Token[] = tokenizer.start();
 
-        const parser: Parser = new Parser(tokens, this.parameters, this.scope);
+        const parser: Parser = new Parser(tokens, this.parameters, this.__view, this.scope);
         return parser.htmlParser(html);
     }
 }

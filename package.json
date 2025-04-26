@@ -1,6 +1,6 @@
 {
-  "name": "zade",
-  "version": "1.0.0",
+  "name": "zare",
+  "version": "0.0.1",
   "description": "A file base component template engine",
   "main": "dist/index.js",
   "type": "module",
