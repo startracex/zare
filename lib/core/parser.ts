@@ -326,7 +326,7 @@ export default class Parser {
                                 const tokenizer: Lexer = new Lexer(content, path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")));
                                 const componentTokens: Token[] = tokenizer.start();
 
-                                const componentParser: Parser = new Parser(componentTokens, undefined, this.__view, undefined, this.linker );
+                                const componentParser: Parser = new Parser(componentTokens, undefined, this.__view, undefined, this.linker, this.script );
 
                                 this.scope.define(componentName, componentParser);
                                 this.eat()
