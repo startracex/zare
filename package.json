@@ -1,0 +1,28 @@
+{
+  "name": "zade",
+  "version": "1.0.0",
+  "description": "A file base component template engine",
+  "main": "dist/index.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "node dist/index.js"
+  },
+  "author": "@IsmailBinMujeeb (ismailbinmujeeb@gmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^22.14.1",
+    "js-beautify": "^1.15.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IsmailBinMujeeb/zade.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IsmailBinMujeeb/zade/issues"
+  },
+  "homepage": "https://github.com/IsmailBinMujeeb/zade#readme"
+}
