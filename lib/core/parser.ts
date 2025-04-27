@@ -13,13 +13,13 @@ export default class Parser {
 
     position: number;
     currentToken: Token;
-    
+
     stack: Stack;
     scope: Scope;
     linker: Scope;
     script: Scope;
 
-    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined,private parentScript: Scope | undefined = undefined ) {
+    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined, private parentScript: Scope | undefined = undefined) {
         this.position = 0;
         this.currentToken = this.tokens[this.position]
         this.stack = new Stack()
@@ -96,18 +96,18 @@ export default class Parser {
         try {
             // Replace the parameter expressions with there actual value eg: @(user.name) => John Doe
             let finalCondition = condition.replace(/@\(.*?\)/g, (match) => {
-    
+
                 if (!this.parameters) return '';
-    
+
                 const inner = match.slice(2, -1).trim();
-    
+
                 const resolve = this.getValue(this.parameters, inner) ? `'${this.getValue(this.parameters, inner).trim()}'` : this.getValue(this.parameters, inner)
-    
+
                 return resolve;
             });
-    
+
             finalCondition = finalCondition.replace(/\((.*?)\)/, "$1"); // replace the `()` from finalCondition to avoid error
-    
+
             return eval(finalCondition)
         } catch (error) {
             if (error instanceof Error && error.stack?.includes("eval")) {
@@ -305,7 +305,7 @@ export default class Parser {
                                 const tokenizer: Lexer = new Lexer(content, path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")));
                                 const componentTokens: Token[] = tokenizer.start();
 
-                                const componentParser: Parser = new Parser(componentTokens, undefined, this.__view, undefined, this.linker, this.script );
+                                const componentParser: Parser = new Parser(componentTokens, undefined, this.__view, undefined, this.linker, this.script);
 
                                 this.scope.define(componentName, componentParser);
                                 this.eat()
@@ -331,7 +331,7 @@ export default class Parser {
                             this.eat()
                         } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                }else if (this.currentToken?.type == TOKEN_TYPES.KEYWORD && this.currentToken?.value == KEYWORDS.IMPORT) {
+                } else if (this.currentToken?.type == TOKEN_TYPES.KEYWORD && this.currentToken?.value == KEYWORDS.IMPORT) {
 
                     this.eat();
                     this.skipSpace();
@@ -397,9 +397,13 @@ export default class Parser {
 
             if (this.currentToken?.type == TOKEN_TYPES.ESCAPE) {
                 html += this.currentToken?.value;
+                this.eat()
+                continue
             }
             else if (this.currentToken?.type == TOKEN_TYPES.TEXT) {
                 html += this.currentToken?.value;
+                this.eat()
+                continue
             } else if (this.currentToken?.type == TOKEN_TYPES.OPENINGTAG) {
                 this.stack.push(this.currentToken);
 
@@ -464,6 +468,9 @@ export default class Parser {
 
                 html += componentHtml || "";
 
+                this.eat()
+                continue
+
             } else if (this.currentToken?.type == TOKEN_TYPES.CLOSINGTAG) {
 
                 const openingTag = this.stack.pop()?.value?.match(/^<([a-zA-Z0-9]+)/)?.[1];
@@ -473,6 +480,9 @@ export default class Parser {
                 if (openingTag !== closingTag) throw Template_Error.toString(`expecting the closing tag for ${openingTag} but got ${closingTag}`, { cause: `expecting the closing tag for ${openingTag} but got ${closingTag}`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath });
 
                 html += this.currentToken.value;
+
+                this.eat()
+                continue
 
             } else if (this.currentToken?.type == TOKEN_TYPES.SELFCLOSINGTAG) {
 
@@ -499,6 +509,8 @@ export default class Parser {
                 const componentHtml = componentParser.updateParameters(componentParameters);
                 html += componentHtml || "";
 
+                this.eat()
+                continue
 
             } else if (this.currentToken?.type == TOKEN_TYPES.COMPONENT) {
 
@@ -524,8 +536,13 @@ export default class Parser {
 
                 html += componentHtml || "";
 
+                this.eat()
+                continue
+
             } else if (this.currentToken?.type == TOKEN_TYPES.PARAMETEREXPRESSION) {
                 html += this.currentToken?.value;
+                this.eat()
+                continue
             } else if (this.currentToken?.type == TOKEN_TYPES.KEYWORD && this.currentToken?.value == KEYWORDS.IF) {
 
                 this.eat()
@@ -549,6 +566,8 @@ export default class Parser {
 
                             if (condition) html = this.blockExecuter(ifCodeBlock, html);
                             else html = this.blockExecuter(this.currentToken?.value, html);
+                            this.eat()
+                            continue
 
                         } else {
 
@@ -571,11 +590,17 @@ export default class Parser {
                         const arrayParameter = this.parameterExecuter(arr, false);
 
                         html += this.forEach(arrayParameter, val.trim(), block)
+
+                        this.eat()
+                        continue
                     } else Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'{ }'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                 } else Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "each looping expression", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-            } else if (this.currentToken.type == "UNKNOWN") html += this.currentToken.value
+            } else if (this.currentToken.type == "UNKNOWN") {
+                html += this.currentToken.value
+                this.eat()
+                continue
+            }
 
-            this.eat()
         }
 
         return html;
