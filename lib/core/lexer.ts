@@ -141,10 +141,13 @@ export default class Lexer {
     readCodeBlock(tokens: Token[]) {
 
         let blockCode: string = '';
+        let braceCount: number = 1;
         this.advance();
         const line = this.line, col = this.column
-        while (this.currentCharacter && this.currentCharacter != '}') {
-            blockCode += this.currentCharacter;
+        while (this.currentCharacter && braceCount > 0) {
+            if (this.currentCharacter == "{") braceCount++;
+            else if (this.currentCharacter == "}") braceCount--;
+            if ( braceCount > 0 )blockCode += this.currentCharacter;
             this.advance();
         }
 
