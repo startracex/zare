@@ -9,9 +9,6 @@ import path from "path";
 import Syntax_Error from "../errors/syntaxError.js";
 import Template_Error from "../errors/templateError.js";
 
-// @ts-ignore
-import beautify from "js-beautify" // Cannot find module 'js-beautify'. Did you mean to set the 'moduleResolution' option to 'nodenext', or to add aliases to the 'paths' option?
-
 export default class Parser {
 
     position: number;
@@ -209,24 +206,6 @@ export default class Parser {
         return this.parameterExecuter(this.parse())
     }
 
-    /**
-     * The function `formatHTML` takes a string of HTML code and returns a formatted version with
-     * specified indentation settings.
-     * @param {string} htmlString - The `htmlString` parameter in the `formatHTML` function is a string
-     * that represents the HTML code that you want to format. This function takes this HTML string as
-     * input and formats it with the specified options before returning the formatted HTML string.
-     * @returns The `formatHTML` function returns the `htmlString` parameter formatted with indentation
-     * based on the specified options.
-     */
-    formatHTML(htmlString: string): string {
-        const formattedHTML = beautify.html(htmlString, {
-            indent_size: 4,       // Set indentation size
-            indent_char: ' ',     // Set indentation character
-            max_preserve_newlines: 0, // Limit number of newlines to preserve
-        });
-        return formattedHTML;
-    }
-
     linkStatic(html: string) {
 
         // Link js files
@@ -396,7 +375,7 @@ export default class Parser {
 
         html = this.linkStatic(html)
 
-        return this.formatHTML(html);
+        return html;
     }
 
     /**
@@ -599,7 +578,7 @@ export default class Parser {
             this.eat()
         }
 
-        return this.formatHTML(html);
+        return html;
     }
 
     /**

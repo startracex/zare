@@ -14,8 +14,7 @@
   "author": "@IsmailBinMujeeb (ismailbinmujeeb@gmail.com)",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^22.14.1",
-    "js-beautify": "^1.15.4"
+    "@types/node": "^22.14.1"
   },
   "repository": {
     "type": "git",
