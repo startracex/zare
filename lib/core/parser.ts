@@ -206,6 +206,40 @@ export default class Parser {
         return this.parameterExecuter(this.parse())
     }
 
+    skipStyle(): string {
+
+        let value: string = '';
+        const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
+
+        while(this.currentToken && !/^<\/.*style>$/.test(this.currentToken.value)) {
+            value += this.currentToken.value;
+            this.eat();
+        }
+
+        if (!this.currentToken) throw Template_Error.toString("Missing closing style tag", { cause: "Missing closing style tag", code: "Template Format", lineNumber: line, columnNumber: col, filePath });
+        value += this.currentToken.value;
+        this.eat();
+
+        return value;
+    }
+
+    skipScript(): string {
+
+        let value: string = '';
+        const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
+
+        while(this.currentToken && !/^<\/.*script>$/.test(this.currentToken.value)) {
+            value += this.currentToken.value;
+            this.eat();
+        }
+
+        if (!this.currentToken) throw Template_Error.toString("Missing closing style tag", { cause: "Missing closing script tag", code: "Template Format", lineNumber: line, columnNumber: col, filePath });
+        value += this.currentToken.value;
+        this.eat();
+
+        return value;
+    }
+
     linkStatic(html: string) {
 
         // Link js files
@@ -410,6 +444,17 @@ export default class Parser {
                 this.eat()
                 continue
             } else if (this.currentToken?.type == TOKEN_TYPES.OPENINGTAG) {
+
+                if (/^<style.*>$/.test(this.currentToken.value)) {
+                    html += this.skipStyle();
+                    continue;
+                }
+                
+                if (/^<script.*>$/.test(this.currentToken.value)) {
+                    html += this.skipScript();
+                    continue;
+                }
+                
                 this.stack.push(this.currentToken);
 
                 const componentMatch = this.currentToken?.value?.trim().match(/^<([a-zA-Z0-9_-]+)([^>]*)\/?>/);
