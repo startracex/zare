@@ -1,4 +1,5 @@
 export const TOKEN_TYPES = {
+    DOCTYPE: "DOCTYPE",
     KEYWORD: "KEYWORD",
     STRING: "STRING",
     TEXT: "TEXT",

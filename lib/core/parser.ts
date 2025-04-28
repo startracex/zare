@@ -404,6 +404,11 @@ export default class Parser {
                 html += this.currentToken?.value;
                 this.eat()
                 continue
+            
+            }else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
+                html += this.currentToken?.value;
+                this.eat()
+                continue
             } else if (this.currentToken?.type == TOKEN_TYPES.OPENINGTAG) {
                 this.stack.push(this.currentToken);
 

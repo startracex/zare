@@ -108,6 +108,7 @@ export default class Lexer {
 
         if (word == "<") tokens.push({ type: TOKEN_TYPES.LESSTHAN, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<\(.*\)>$/.test(word)) tokens.push({ type: TOKEN_TYPES.COMPONENT, value: word, line: this.line, column: this.column, filePath: this.filePath })
+        else if (/^<!DOCTYPE.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.DOCTYPE, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<\/.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.CLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<.*\/>$/.test(word)) tokens.push({ type: TOKEN_TYPES.SELFCLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
