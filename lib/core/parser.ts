@@ -517,33 +517,6 @@ export default class Parser {
                 this.eat()
                 continue
 
-            } else if (this.currentToken?.type == TOKEN_TYPES.COMPONENT) {
-
-                const componentSplitValue: string | undefined = this.currentToken?.value?.trim()?.match(/<\(([^)]+)\)>/)?.[1];
-
-                if (!componentSplitValue) throw new TypeError("Invalid component");
-
-                const componentName: string | undefined = componentSplitValue.match(/^([a-zA-Z0-9_-]+)/)?.[1]?.trim();
-
-                if (!componentName) throw new TypeError("Component name is undefined");
-
-                const componentParameters: Record<string, any> = {};
-                const attrRegex = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
-                let matchParameter: RegExpExecArray | null;
-
-                while ((matchParameter = attrRegex.exec(componentSplitValue)) !== null) {
-                    componentParameters[matchParameter[1]] = matchParameter[2];
-                }
-
-                const componentParser = this.scope.lookup(componentName);
-
-                const componentHtml = componentParser?.updateParameters(componentParameters);
-
-                html += componentHtml || "";
-
-                this.eat()
-                continue
-
             } else if (this.currentToken?.type == TOKEN_TYPES.PARAMETEREXPRESSION) {
                 html += this.currentToken?.value;
                 this.eat()
