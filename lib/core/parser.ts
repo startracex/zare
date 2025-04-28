@@ -176,12 +176,12 @@ export default class Parser {
         if (!Array.isArray(arr)) throw Syntax_Error.toString("accepting an array got " + typeof arr, { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "An Array parameter", actualValue: typeof arr })
         let html = '';
 
-        arr.forEach((e) => {
+        arr.forEach((e, _i) => {
 
             const tokenizer: Lexer = new Lexer(codeBlock, '', true);
             const tokens: Token[] = tokenizer.start();
 
-            const parser: Parser = new Parser(tokens, { [key]: e }, this.__view, this.scope);
+            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -454,7 +454,7 @@ export default class Parser {
                     html += this.skipScript();
                     continue;
                 }
-                
+
                 this.stack.push(this.currentToken);
 
                 const componentMatch = this.currentToken?.value?.trim().match(/^<([a-zA-Z0-9_-]+)([^>]*)\/?>/);
