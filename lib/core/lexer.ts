@@ -113,6 +113,34 @@ export default class Lexer {
         else if (/^<.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
     }
 
+    readFunctionCall(tokens: Token[]): boolean {
+
+        let value: string = this.currentCharacter;
+                const beforePosition: number = this.position // we will use this position to reset the position if it is not a function call;
+                let parentCount: number = -1;
+                this.advance();
+                while (this.currentCharacter && parentCount != 0) {
+                    if (this.currentCharacter == '(') {
+                        if (parentCount == -1) parentCount = 1;
+                        else parentCount++;
+                    } else if (this.currentCharacter == ')') parentCount--;
+                    value += this.currentCharacter;
+                    this.advance();
+                }
+
+                if (!this.currentCharacter) console.log("Error here");
+                
+                if (/@([a-zA-Z0-9]+)\(([^)]*)\)/.test(value)) {
+                    tokens.push({ type: TOKEN_TYPES.FUNCTIONCALL, value: value.trim(), line: this.line, column: this.column, filePath: this.filePath });
+                    this.advance();
+                    return true;
+                }
+                
+                this.position = beforePosition;
+                this.currentCharacter = this.code[this.position];
+                return false;
+    }
+
     /**
      * The function reads a parameter from a list of tokens until it reaches a closing parenthesis and
      * adds it to the tokens array if it matches a specific pattern.
@@ -353,6 +381,12 @@ export default class Lexer {
 
                 this.readParameter(tokens)
                 continue;
+            }
+
+            if (this.currentCharacter == "@") {
+
+                const isFunctionCall = this.readFunctionCall(tokens);
+                if (isFunctionCall) continue;
             }
 
             if (this.currentCharacter == '@' && this.code[this.position + 1] == 'i' && this.code[this.position + 2] == 'f') {

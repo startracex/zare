@@ -18,14 +18,16 @@ export default class Parser {
     scope: Scope;
     linker: Scope;
     script: Scope;
+    functions: Scope;
 
-    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined, private parentScript: Scope | undefined = undefined) {
+    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined, private parentScript: Scope | undefined = undefined, private parentFunctions: Scope | undefined = undefined) {
         this.position = 0;
         this.currentToken = this.tokens[this.position]
         this.stack = new Stack()
         this.scope = new Scope(parentComponent)
         this.linker = new Scope(parentLinker);
         this.script = new Scope(parentScript);
+        this.functions = new Scope(parentFunctions)
     }
 
     /**
@@ -206,12 +208,70 @@ export default class Parser {
         return this.parameterExecuter(this.parse())
     }
 
+    extractFunctionCallValues(value: string) {
+        const regex = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
+        const match = value.match(regex);
+
+        if (!match) return null;
+
+        const fnName: string = match[1];
+        const inside = match[2];
+
+        const fnArgs: any[] = [];
+        let current: string = '';
+        let depth: number = 0;
+        let inString: string | null = null;
+
+        for (let i = 0; i < inside.length; i++) {
+            const char = inside[i];
+            const prevChar = inside[i - 1];
+
+            // String handling with escapes
+            if ((char === '"' || char === "'") && prevChar !== '\\') {
+                if (inString === char) {
+                    inString = null; // closing quote
+                } else if (!inString) {
+                    inString = char; // opening quote
+                }
+                current += char;
+            } else if (!inString && (char === '(' || char === '{' || char === '[')) {
+                depth++;
+                current += char;
+            } else if (!inString && (char === ')' || char === '}' || char === ']')) {
+                depth--;
+                current += char;
+            } else if (char === ',' && depth === 0 && !inString) {
+                const trimmed = current.trim();
+                if (/^[a-zA-Z0-9]+$/.test(trimmed))
+                    fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+                else
+                    fnArgs.push(trimmed);
+
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+
+        // Final arg
+        if (current.trim() !== '') {
+            const trimmed = current.trim();
+            if (/^[a-zA-Z0-9]+$/.test(trimmed)) {
+                fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+            } else {
+                fnArgs.push(trimmed);
+            }
+        }
+
+        return { fnName, fnArgs };
+    }
+
     skipStyle(): string {
 
         let value: string = '';
         const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
 
-        while(this.currentToken && !/^<\/.*style>$/.test(this.currentToken.value)) {
+        while (this.currentToken && !/^<\/.*style>$/.test(this.currentToken.value)) {
             value += this.currentToken.value;
             this.eat();
         }
@@ -228,7 +288,7 @@ export default class Parser {
         let value: string = '';
         const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
 
-        while(this.currentToken && !/^<\/.*script>$/.test(this.currentToken.value)) {
+        while (this.currentToken && !/^<\/.*script>$/.test(this.currentToken.value)) {
             value += this.currentToken.value;
             this.eat();
         }
@@ -383,6 +443,62 @@ export default class Parser {
                             this.eat()
                         } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
+                } else if (this.currentToken?.value == KEYWORDS.FN) {
+
+                    this.eat();
+                    this.skipSpace();
+
+                    if (this.currentToken && this.currentToken.type == TOKEN_TYPES.TEXT) {
+
+                        const fnName: string = this.currentToken.value;
+                        let fnBody: string = '';
+                        const fnParams: string[] = [];
+                        this.eat();
+                        this.skipSpace();
+
+                        if (this.currentToken && this.currentToken.type == TOKEN_TYPES.LPARENT) {
+
+                            let parentCount = 1;
+                            const line = this.currentToken.line, col = this.currentToken.column, filePath = this.currentToken.filePath
+                            this.eat();
+                            while (this.currentToken && parentCount > 0) {
+                                this.skipSpace();
+                                if (this.currentToken.type == TOKEN_TYPES.LPARENT) parentCount++;
+                                else if (this.currentToken.type == TOKEN_TYPES.RPARENT) parentCount--;
+                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.trim());
+                                this.eat();
+                            }
+
+                            if (!this.currentToken) throw Syntax_Error.toString("Expected a closing parenthesis", { code: "Syntax Error", lineNumber: line, columnNumber: col, filePath, expectedValue: ")", actualValue: 'EOF' });
+
+                            this.eat();
+                            this.skipSpace();
+
+                            if (this.currentToken.value == '{') {
+                                this.eat();
+                                let braceCount = 1;
+                                const line = this.currentToken.line, col = this.currentToken.column, filePath = this.currentToken.filePath;
+
+                                while (this.currentToken && braceCount > 0) {
+                                    if (this.currentToken.value == '{') braceCount++;
+                                    else if (this.currentToken.value == '}') {
+                                        braceCount--;
+                                        if (!braceCount) break
+                                    }
+
+                                    fnBody += this.currentToken.value;
+                                    this.eat();
+                                }
+
+                                if (!this.currentToken) throw Template_Error.toString("Unended '}'", { cause: "expected an '}'", code: "Template Error", lineNumber: line, columnNumber: col, filePath })
+
+                                const newFunction = new Function(...fnParams, fnBody)
+                                this.functions.define(fnName, newFunction);
+                                this.eat();
+                            } else throw Syntax_Error.toString("Expected '{'", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "{", actualValue: this.currentToken?.value })
+                        } else throw Syntax_Error.toString("Expected '('", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "(", actualValue: this.currentToken?.value })
+                    } else throw Syntax_Error.toString("Expected an function name", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "Function name", actualValue: this.currentToken?.value })
+
                 } else if (this.currentToken?.value == KEYWORDS.SERVE) {
 
                     this.eat()
@@ -402,7 +518,7 @@ export default class Parser {
                         if (poped?.type != TOKEN_TYPES.LPARENT) throw Template_Error.toString("Unclosed tag", { cause: `Unclosed token '${poped?.value}'`, code: "Template Format", lineNumber: poped?.line || -1, columnNumber: poped?.column || -1, filePath: poped?.filePath || '' })
 
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "(", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "Keyword 'as', 'return' or 'link'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
+                } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "Keyword 'as', 'serve', 'fn' or 'link'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
             }
             this.eat();
         }
@@ -438,8 +554,8 @@ export default class Parser {
                 html += this.currentToken?.value;
                 this.eat()
                 continue
-            
-            }else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
+
+            } else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
                 html += this.currentToken?.value;
                 this.eat()
                 continue
@@ -449,7 +565,7 @@ export default class Parser {
                     html += this.skipStyle();
                     continue;
                 }
-                
+
                 if (/^<script.*>$/.test(this.currentToken.value)) {
                     html += this.skipScript();
                     continue;
