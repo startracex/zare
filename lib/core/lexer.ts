@@ -52,9 +52,9 @@ export default class Lexer {
             this.advance()
         }
 
-        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.CSS, KEYWORDS.RETURN].includes(value) && !this.isReturnBlock) {
+        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.CSS, KEYWORDS.SERVE].includes(value) && !this.isReturnBlock) {
             tokens.push({ type: TOKEN_TYPES.KEYWORD, value: value, line: this.line, column: this.column, filePath: this.filePath });
-            if (value.trim() == KEYWORDS.RETURN) this.isReturnBlock = true;
+            if (value.trim() == KEYWORDS.SERVE) this.isReturnBlock = true;
         } else {
             tokens.push({ type: TOKEN_TYPES.TEXT, value: value, line: this.line, column: this.column, filePath: this.filePath });
         }

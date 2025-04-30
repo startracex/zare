@@ -383,7 +383,7 @@ export default class Parser {
                             this.eat()
                         } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                } else if (this.currentToken?.value == KEYWORDS.RETURN) {
+                } else if (this.currentToken?.value == KEYWORDS.SERVE) {
 
                     this.eat()
 
