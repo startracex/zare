@@ -383,12 +383,6 @@ export default class Lexer {
                 continue;
             }
 
-            if (this.currentCharacter == "@") {
-
-                const isFunctionCall = this.readFunctionCall(tokens);
-                if (isFunctionCall) continue;
-            }
-
             if (this.currentCharacter == '@' && this.code[this.position + 1] == 'i' && this.code[this.position + 2] == 'f') {
 
                 this.readIfStatement(tokens);
@@ -405,6 +399,12 @@ export default class Lexer {
 
                 this.readEachStatement(tokens)
                 continue;
+            }
+
+            if (this.currentCharacter == "@") {
+
+                const isFunctionCall = this.readFunctionCall(tokens);
+                if (isFunctionCall) continue;
             }
 
             tokens.push({ type: 'UNKNOWN', value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath })

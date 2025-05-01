@@ -451,6 +451,9 @@ export default class Parser {
                     if (this.currentToken && this.currentToken.type == TOKEN_TYPES.TEXT) {
 
                         const fnName: string = this.currentToken.value;
+
+                        if (["if", "else", "each"].includes(fnName)) throw Template_Error.toString("Can not assign keywords as identifiers", { cause: `Can not assign keywords as identifier, assigning "${fnName}" keyword to a function.`,code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+
                         let fnBody: string = '';
                         const fnParams: string[] = [];
                         this.eat();
