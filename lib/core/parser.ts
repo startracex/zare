@@ -85,14 +85,15 @@ export default class Parser {
         }
     }
 
+
     /**
-     * The `eval` function in TypeScript evaluates a given condition string by replacing parameter
-     * expressions with their actual values and then executing the resulting expression.
-     * @param {string} condition - The code snippet you provided seems to be a function that evaluates
-     * a condition by replacing parameter expressions with their actual values and then using `eval()`
-     * to evaluate the final condition.
-     * @returns The `eval` function is returning the result of evaluating the final condition after
-     * replacing parameter expressions with their actual values and removing any parentheses.
+     * The `eval` function in TypeScript evaluates a given condition string by replacing function calls
+     * and parameter expressions with their actual values and then executing the final condition.
+     * @param {string} condition - The `eval` function you provided seems to be a JavaScript function
+     * that evaluates a given condition string. It appears to handle function calls and parameter
+     * expressions within the condition string.
+     * @returns The `eval` function is returning the result of evaluating the condition provided as a
+     * string. The condition undergoes several transformations before being executed:
      */
     eval(condition: string) {
 
@@ -218,6 +219,16 @@ export default class Parser {
         return this.parameterExecuter(this.parse())
     }
 
+    /**
+     * The function `extractFunctionCallValues` parses a string to extract the function name and its
+     * arguments enclosed in parentheses.
+     * @param {string} value - The `extractFunctionCallValues` function takes a string `value` as
+     * input, which represents a function call in the format `@functionName(arg1, arg2, ...)`.
+     * @returns The function `extractFunctionCallValues` returns an object with two properties:
+     * `fnName` which is a string representing the function name extracted from the input value, and
+     * `fnArgs` which is an array containing the arguments passed to the function extracted from the
+     * input value.
+     */
     extractFunctionCallValues(value: string) {
         const regex = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
         const match = value.match(regex);
@@ -278,6 +289,11 @@ export default class Parser {
         return { fnName, fnArgs };
     }
 
+    /**
+     * The function `skipStyle` in TypeScript skips over style tags and returns the concatenated style
+     * content as a string.
+     * @returns The `skipStyle()` method is returning a string value.
+     */
     skipStyle(): string {
 
         let value: string = '';
@@ -295,6 +311,14 @@ export default class Parser {
         return value;
     }
 
+    /**
+     * This function skips over script content in a TypeScript file until it reaches a closing script
+     * tag.
+     * @returns The `skipScript()` function returns a string value that represents the content between
+     * an opening `<script>` tag and a closing `</script>` tag in a template. The function reads tokens
+     * until it encounters the closing `</script>` tag, concatenates the token values into a string,
+     * and then returns that string.
+     */
     skipScript(): string {
 
         let value: string = '';
@@ -312,6 +336,17 @@ export default class Parser {
         return value;
     }
 
+    /**
+     * The function `linkStatic` in TypeScript is used to dynamically link JavaScript and CSS files to
+     * an HTML string based on specified arrays of file names.
+     * @param {string} html - The `linkStatic` function you provided is used to dynamically link
+     * JavaScript and CSS files to an HTML string. It searches for the `<head>` tag in the HTML content
+     * and then inserts the script or link tags accordingly.
+     * @returns The `linkStatic` function returns the HTML content with JavaScript and CSS files linked
+     * based on the values in the `script` and `linker` arrays. The JavaScript files are linked using
+     * `<script>` tags with `src` attribute pointing to the JavaScript file, and the CSS files are
+     * linked using `<link>` tags with `rel="stylesheet"` and `href` attribute pointing to the CSS file
+     */
     linkStatic(html: string) {
 
         // Link js files

@@ -60,6 +60,10 @@ export default class Lexer {
         }
     }
 
+    /**
+     * The function `readSingleLineComments` reads and advances through a single line comment in Zare
+     * code.
+     */
     readSingleLineComments() {
         this.advance();
         this.advance();
@@ -122,6 +126,17 @@ export default class Lexer {
         else if (/^<.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
     }
 
+    /**
+     * The function `readFunctionCall` reads a function call from a list of tokens in TypeScript code.
+     * @param {Token[]} tokens - The `tokens` parameter is an array of objects representing tokens in a
+     * code snippet. Each token object typically contains information such as the type of token, its
+     * value, line number, column number, and file path where it was found. In the `readFunctionCall`
+     * function, this parameter is used
+     * @returns The `readFunctionCall` function returns a boolean value. It returns `true` if a
+     * function call is successfully identified and added to the `tokens` array, and `false` if a
+     * function call is not found and the position is reset to the original position before the
+     * function call check.
+     */
     readFunctionCall(tokens: Token[]): boolean {
 
         let value: string = this.currentCharacter;
