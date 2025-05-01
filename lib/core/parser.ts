@@ -179,10 +179,10 @@ export default class Parser {
         if (!Array.isArray(arr)) throw Syntax_Error.toString("accepting an array got " + typeof arr, { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "An Array parameter", actualValue: typeof arr })
         let html = '';
 
-        arr.forEach((e, _i) => {
+        const tokenizer: Lexer = new Lexer(codeBlock, '', true);
+        const tokens: Token[] = tokenizer.start();
 
-            const tokenizer: Lexer = new Lexer(codeBlock, '', true);
-            const tokens: Token[] = tokenizer.start();
+        arr.forEach((e, _i) => {
 
             const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope);
             const parsed: string = parser.htmlParser('');
@@ -243,7 +243,7 @@ export default class Parser {
                 current += char;
             } else if (char === ',' && depth === 0 && !inString) {
                 const trimmed = current.trim();
-                
+
                 if (/^[a-zA-Z0-9]+$/.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
                 else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
@@ -478,7 +478,7 @@ export default class Parser {
 
                         const fnName: string = this.currentToken.value;
 
-                        if (["if", "else", "each"].includes(fnName)) throw Template_Error.toString("Can not assign keywords as identifiers", { cause: `Can not assign keywords as identifier, assigning "${fnName}" keyword to a function.`,code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+                        if (["if", "else", "each"].includes(fnName)) throw Template_Error.toString("Can not assign keywords as identifiers", { cause: `Can not assign keywords as identifier, assigning "${fnName}" keyword to a function.`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
 
                         let fnBody: string = '';
                         const fnParams: string[] = [];
