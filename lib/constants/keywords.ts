@@ -3,7 +3,9 @@ export const KEYWORDS = {
     IMPORT: "import",
     LINK: "link",
     CSS: "css",
-    RETURN: "return",
+    FN: "fn",
+    USE: "use",
+    SERVE: "serve",
     IF: "@if",
     ELSE: "@else",
     EACH: "@each"

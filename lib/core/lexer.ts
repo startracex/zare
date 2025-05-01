@@ -52,11 +52,24 @@ export default class Lexer {
             this.advance()
         }
 
-        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.CSS, KEYWORDS.RETURN].includes(value) && !this.isReturnBlock) {
+        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.CSS, KEYWORDS.SERVE, KEYWORDS.USE].includes(value) && !this.isReturnBlock) {
             tokens.push({ type: TOKEN_TYPES.KEYWORD, value: value, line: this.line, column: this.column, filePath: this.filePath });
-            if (value.trim() == KEYWORDS.RETURN) this.isReturnBlock = true;
+            if (value.trim() == KEYWORDS.SERVE) this.isReturnBlock = true;
         } else {
             tokens.push({ type: TOKEN_TYPES.TEXT, value: value, line: this.line, column: this.column, filePath: this.filePath });
+        }
+    }
+
+    /**
+     * The function `readSingleLineComments` reads and advances through a single line comment in Zare
+     * code.
+     */
+    readSingleLineComments() {
+        this.advance();
+        this.advance();
+
+        while (this.currentCharacter && this.currentCharacter != "\n") {
+            this.advance();
         }
     }
 
@@ -107,11 +120,49 @@ export default class Lexer {
         this.advance()
 
         if (word == "<") tokens.push({ type: TOKEN_TYPES.LESSTHAN, value: word, line: this.line, column: this.column, filePath: this.filePath })
-        else if (/^<\(.*\)>$/.test(word)) tokens.push({ type: TOKEN_TYPES.COMPONENT, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<!DOCTYPE.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.DOCTYPE, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<\/.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.CLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<.*\/>$/.test(word)) tokens.push({ type: TOKEN_TYPES.SELFCLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
         else if (/^<.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
+    }
+
+    /**
+     * The function `readFunctionCall` reads a function call from a list of tokens in TypeScript code.
+     * @param {Token[]} tokens - The `tokens` parameter is an array of objects representing tokens in a
+     * code snippet. Each token object typically contains information such as the type of token, its
+     * value, line number, column number, and file path where it was found. In the `readFunctionCall`
+     * function, this parameter is used
+     * @returns The `readFunctionCall` function returns a boolean value. It returns `true` if a
+     * function call is successfully identified and added to the `tokens` array, and `false` if a
+     * function call is not found and the position is reset to the original position before the
+     * function call check.
+     */
+    readFunctionCall(tokens: Token[]): boolean {
+
+        let value: string = this.currentCharacter;
+        const beforePosition: number = this.position // we will use this position to reset the position if it is not a function call;
+        let parentCount: number = -1;
+        this.advance();
+        while (this.currentCharacter && parentCount != 0) {
+            if (this.currentCharacter == '(') {
+                if (parentCount == -1) parentCount = 1;
+                else parentCount++;
+            } else if (this.currentCharacter == ')') parentCount--;
+            value += this.currentCharacter;
+            this.advance();
+        }
+
+        if (!this.currentCharacter) console.log("Error here");
+
+        if (/@([a-zA-Z0-9]+)\(([^)]*)\)/.test(value)) {
+            tokens.push({ type: TOKEN_TYPES.FUNCTIONCALL, value: value.trim(), line: this.line, column: this.column, filePath: this.filePath });
+            this.advance();
+            return true;
+        }
+
+        this.position = beforePosition;
+        this.currentCharacter = this.code[this.position];
+        return false;
     }
 
     /**
@@ -148,7 +199,7 @@ export default class Lexer {
         while (this.currentCharacter && braceCount > 0) {
             if (this.currentCharacter == "{") braceCount++;
             else if (this.currentCharacter == "}") braceCount--;
-            if ( braceCount > 0 )blockCode += this.currentCharacter;
+            if (braceCount > 0) blockCode += this.currentCharacter;
             this.advance();
         }
 
@@ -306,6 +357,31 @@ export default class Lexer {
                 continue;
             }
 
+            if (!this.isReturnBlock && this.currentCharacter == "#") {
+
+                this.readSingleLineComments();
+
+                this.advance();
+                continue;
+            }
+
+            if (this.isReturnBlock && this.currentCharacter == "<" && this.code[this.position + 1] == "!" && this.code[this.position + 2] == "-" && this.code[this.position + 3] == "-") {
+
+                this.advance();
+                this.advance();
+                this.advance();
+                this.advance();
+                let value: string = "";
+
+                while (!value.endsWith("-->")) {
+                    value += this.currentCharacter;
+                    this.advance();
+                }
+
+                this.advance();
+                continue
+            }
+
             // Handling alphabats for keywords and text
             if (/^[a-zA-Z0-9]+$/.test(this.currentCharacter)) {
 
@@ -331,18 +407,6 @@ export default class Lexer {
                 this.advance()
                 continue;
             }
-
-            // if (this.currentCharacter == "{") {
-            //     tokens.push({ type: TOKEN_TYPES.LCBRACE, value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath });
-            //     this.advance()
-            //     continue;
-            // }
-
-            // if (this.currentCharacter == "}") {
-            //     tokens.push({ type: TOKEN_TYPES.RCBRACE, value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath });
-            //     this.advance()
-            //     continue;
-            // }
 
             if (this.currentCharacter == "<") {
 
@@ -372,6 +436,12 @@ export default class Lexer {
 
                 this.readEachStatement(tokens)
                 continue;
+            }
+
+            if (this.currentCharacter == "@") {
+
+                const isFunctionCall = this.readFunctionCall(tokens);
+                if (isFunctionCall) continue;
             }
 
             tokens.push({ type: 'UNKNOWN', value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath })

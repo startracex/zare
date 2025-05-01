@@ -4,6 +4,7 @@ import Scope from "../utils/scope.js";
 import { TOKEN_TYPES } from "../constants/tokenTypes.js";
 import { KEYWORDS } from "../constants/keywords.js";
 import { Token } from "../types/token.js";
+import modules from "../modules/index.js";
 import fs from "fs";
 import path from "path";
 import Syntax_Error from "../errors/syntaxError.js";
@@ -18,14 +19,16 @@ export default class Parser {
     scope: Scope;
     linker: Scope;
     script: Scope;
+    functions: Scope;
 
-    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined, private parentScript: Scope | undefined = undefined) {
+    constructor(private tokens: Token[], private parameters: Record<string, any> | undefined = undefined, private __view: string, private parentComponent: Scope | undefined = undefined, private parentLinker: Scope | undefined = undefined, private parentScript: Scope | undefined = undefined, private parentFunctions: Scope | undefined = undefined) {
         this.position = 0;
         this.currentToken = this.tokens[this.position]
         this.stack = new Stack()
         this.scope = new Scope(parentComponent)
         this.linker = new Scope(parentLinker);
         this.script = new Scope(parentScript);
+        this.functions = new Scope(parentFunctions)
     }
 
     /**
@@ -82,37 +85,47 @@ export default class Parser {
         }
     }
 
+
     /**
-     * The `eval` function in TypeScript evaluates a given condition string by replacing parameter
-     * expressions with their actual values and then executing the resulting expression.
-     * @param {string} condition - The code snippet you provided seems to be a function that evaluates
-     * a condition by replacing parameter expressions with their actual values and then using `eval()`
-     * to evaluate the final condition.
-     * @returns The `eval` function is returning the result of evaluating the final condition after
-     * replacing parameter expressions with their actual values and removing any parentheses.
+     * The `eval` function in TypeScript evaluates a given condition string by replacing function calls
+     * and parameter expressions with their actual values and then executing the final condition.
+     * @param {string} condition - The `eval` function you provided seems to be a JavaScript function
+     * that evaluates a given condition string. It appears to handle function calls and parameter
+     * expressions within the condition string.
+     * @returns The `eval` function is returning the result of evaluating the condition provided as a
+     * string. The condition undergoes several transformations before being executed:
      */
     eval(condition: string) {
 
         try {
-            // Replace the parameter expressions with there actual value eg: @(user.name) => John Doe
-            let finalCondition = condition.replace(/@\(.*?\)/g, (match) => {
 
-                if (!this.parameters) return '';
+            condition = condition.trim().slice(1, -1)
+            
+            // if any function calls appear call them
+            condition = condition.replace(/[a-zA-Z0-9_]+\(([\s\S]*?)\)/g, (match) => {
 
-                const inner = match.slice(2, -1).trim();
+                const functionProperties = this.extractFunctionCallValues('@' + match.trim());
+                const fn = this.functions.lookup(functionProperties?.fnName);
 
-                const resolve = this.getValue(this.parameters, inner) ? `'${this.getValue(this.parameters, inner).trim()}'` : this.getValue(this.parameters, inner)
+                const result = fn(functionProperties?.fnArgs);
+                return result
+            } )
+            
+            // Replace the parameter expressions with there actual value eg: user.name => John Doe
+            condition = condition.replace(/[a-zA-Z0-9]+/g, (match) => {
 
-                return resolve;
+                if (!this.parameters) return match;
+
+                const fn = new Function(...Object.keys(this.parameters), `return ${match.trim()}`);
+                return fn(...Object.values(this.parameters))
             });
 
-            finalCondition = finalCondition.replace(/\((.*?)\)/, "$1"); // replace the `()` from finalCondition to avoid error
-
-            return eval(finalCondition)
+            // Final condition execution
+            const fn = new Function(...Object.keys(this.parameters || []), `return ${condition}`);
+            return fn(...Object.values(this.parameters || []));
         } catch (error) {
-            if (error instanceof Error && error.stack?.includes("eval")) {
-                throw Template_Error.toString(error.message, { cause: error.message, code: "Expression Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
-            }
+            if (error instanceof Error)
+            throw Template_Error.toString(error.message, { cause: error.message, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
         }
     }
 
@@ -176,12 +189,12 @@ export default class Parser {
         if (!Array.isArray(arr)) throw Syntax_Error.toString("accepting an array got " + typeof arr, { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "An Array parameter", actualValue: typeof arr })
         let html = '';
 
-        arr.forEach((e) => {
+        const tokenizer: Lexer = new Lexer(codeBlock, '', true);
+        const tokens: Token[] = tokenizer.start();
 
-            const tokenizer: Lexer = new Lexer(codeBlock, '', true);
-            const tokens: Token[] = tokenizer.start();
+        arr.forEach((e, _i) => {
 
-            const parser: Parser = new Parser(tokens, { [key]: e }, this.__view, this.scope);
+            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -206,6 +219,134 @@ export default class Parser {
         return this.parameterExecuter(this.parse())
     }
 
+    /**
+     * The function `extractFunctionCallValues` parses a string to extract the function name and its
+     * arguments enclosed in parentheses.
+     * @param {string} value - The `extractFunctionCallValues` function takes a string `value` as
+     * input, which represents a function call in the format `@functionName(arg1, arg2, ...)`.
+     * @returns The function `extractFunctionCallValues` returns an object with two properties:
+     * `fnName` which is a string representing the function name extracted from the input value, and
+     * `fnArgs` which is an array containing the arguments passed to the function extracted from the
+     * input value.
+     */
+    extractFunctionCallValues(value: string) {
+        const regex = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
+        const match = value.match(regex);
+
+        if (!match) return null;
+
+        const fnName: string = match[1];
+        const inside = match[2];
+
+        const fnArgs: any[] = [];
+        let current: string = '';
+        let depth: number = 0;
+        let inString: string | null = null;
+
+        for (let i = 0; i < inside.length; i++) {
+            const char = inside[i];
+            const prevChar = inside[i - 1];
+
+            // String handling with escapes
+            if ((char === '"' || char === "'") && prevChar !== '\\') {
+                if (inString === char) {
+                    inString = null; // closing quote
+                } else if (!inString) {
+                    inString = char; // opening quote
+                }
+                current += char;
+            } else if (!inString && (char === '(' || char === '{' || char === '[')) {
+                depth++;
+                current += char;
+            } else if (!inString && (char === ')' || char === '}' || char === ']')) {
+                depth--;
+                current += char;
+            } else if (char === ',' && depth === 0 && !inString) {
+                const trimmed = current.trim();
+
+                if (/^[a-zA-Z0-9]+$/.test(trimmed))
+                    fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+                else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
+                else
+                    fnArgs.push(trimmed);
+
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+
+        // Final arg
+        if (current.trim() !== '') {
+            const trimmed = current.trim();
+            if (Number(trimmed)) fnArgs.push(trimmed)
+            else if (/^[a-zA-Z0-9]+$/.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+            else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
+            else fnArgs.push(trimmed);
+
+        }
+
+        return { fnName, fnArgs };
+    }
+
+    /**
+     * The function `skipStyle` in TypeScript skips over style tags and returns the concatenated style
+     * content as a string.
+     * @returns The `skipStyle()` method is returning a string value.
+     */
+    skipStyle(): string {
+
+        let value: string = '';
+        const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
+
+        while (this.currentToken && !/^<\/.*style>$/.test(this.currentToken.value)) {
+            value += this.currentToken.value;
+            this.eat();
+        }
+
+        if (!this.currentToken) throw Template_Error.toString("Missing closing style tag", { cause: "Missing closing style tag", code: "Template Format", lineNumber: line, columnNumber: col, filePath });
+        value += this.currentToken.value;
+        this.eat();
+
+        return value;
+    }
+
+    /**
+     * This function skips over script content in a TypeScript file until it reaches a closing script
+     * tag.
+     * @returns The `skipScript()` function returns a string value that represents the content between
+     * an opening `<script>` tag and a closing `</script>` tag in a template. The function reads tokens
+     * until it encounters the closing `</script>` tag, concatenates the token values into a string,
+     * and then returns that string.
+     */
+    skipScript(): string {
+
+        let value: string = '';
+        const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
+
+        while (this.currentToken && !/^<\/.*script>$/.test(this.currentToken.value)) {
+            value += this.currentToken.value;
+            this.eat();
+        }
+
+        if (!this.currentToken) throw Template_Error.toString("Missing closing style tag", { cause: "Missing closing script tag", code: "Template Format", lineNumber: line, columnNumber: col, filePath });
+        value += this.currentToken.value;
+        this.eat();
+
+        return value;
+    }
+
+    /**
+     * The function `linkStatic` in TypeScript is used to dynamically link JavaScript and CSS files to
+     * an HTML string based on specified arrays of file names.
+     * @param {string} html - The `linkStatic` function you provided is used to dynamically link
+     * JavaScript and CSS files to an HTML string. It searches for the `<head>` tag in the HTML content
+     * and then inserts the script or link tags accordingly.
+     * @returns The `linkStatic` function returns the HTML content with JavaScript and CSS files linked
+     * based on the values in the `script` and `linker` arrays. The JavaScript files are linked using
+     * `<script>` tags with `src` attribute pointing to the JavaScript file, and the CSS files are
+     * linked using `<link>` tags with `rel="stylesheet"` and `href` attribute pointing to the CSS file
+     */
     linkStatic(html: string) {
 
         // Link js files
@@ -281,7 +422,30 @@ export default class Parser {
 
             if (this.currentToken?.type == TOKEN_TYPES.KEYWORD) { // Check the keyword in the non return block
 
-                if (this.currentToken?.value == KEYWORDS.AS) {
+                if (this.currentToken?.value == KEYWORDS.USE) {
+
+                    this.eat();
+                    this.skipSpace();
+
+                    if (this.currentToken?.type == TOKEN_TYPES.TEXT) {
+
+                        const moduleName = this.currentToken.value;
+                        let methods;
+
+                        if (moduleName == "string") methods = modules.string;
+                        else if (moduleName == "number") methods = modules.number;
+                        else if (moduleName == "date") methods = modules.date;
+                        else if (moduleName == "math") methods = modules.math;
+                        else throw Template_Error.toString("Unknown module usage", { cause: `Unknown module ${moduleName}`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+
+                        methods.forEach((method: { fnName: string, fnParams: string[], fnBody: string }) => {
+
+                            const fn = new Function(...method.fnParams, method.fnBody);
+                            this.functions.define(method.fnName, fn);
+                        })
+                    } else throw Syntax_Error.toString("Expected an identifier", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "identifier", actualValue: this.currentToken.value })
+
+                } else if (this.currentToken?.value == KEYWORDS.AS) {
 
                     this.eat()
 
@@ -349,7 +513,66 @@ export default class Parser {
                             this.eat()
                         } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                } else if (this.currentToken?.value == KEYWORDS.RETURN) {
+                } else if (this.currentToken?.value == KEYWORDS.FN) {
+
+                    this.eat();
+                    this.skipSpace();
+
+                    if (this.currentToken && this.currentToken.type == TOKEN_TYPES.TEXT) {
+
+                        const fnName: string = this.currentToken.value;
+
+                        if (["if", "else", "each"].includes(fnName)) throw Template_Error.toString("Can not assign keywords as identifiers", { cause: `Can not assign keywords as identifier, assigning "${fnName}" keyword to a function.`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+
+                        let fnBody: string = '';
+                        const fnParams: string[] = [];
+                        this.eat();
+                        this.skipSpace();
+
+                        if (this.currentToken && this.currentToken.type == TOKEN_TYPES.LPARENT) {
+
+                            let parentCount = 1;
+                            const line = this.currentToken.line, col = this.currentToken.column, filePath = this.currentToken.filePath
+                            this.eat();
+                            while (this.currentToken && parentCount > 0) {
+                                this.skipSpace();
+                                if (this.currentToken.type == TOKEN_TYPES.LPARENT) parentCount++;
+                                else if (this.currentToken.type == TOKEN_TYPES.RPARENT) parentCount--;
+                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.trim());
+                                this.eat();
+                            }
+
+                            if (!this.currentToken) throw Syntax_Error.toString("Expected a closing parenthesis", { code: "Syntax Error", lineNumber: line, columnNumber: col, filePath, expectedValue: ")", actualValue: 'EOF' });
+
+                            this.eat();
+                            this.skipSpace();
+
+                            if (this.currentToken.value == '{') {
+                                this.eat();
+                                let braceCount = 1;
+                                const line = this.currentToken.line, col = this.currentToken.column, filePath = this.currentToken.filePath;
+
+                                while (this.currentToken && braceCount > 0) {
+                                    if (this.currentToken.value == '{') braceCount++;
+                                    else if (this.currentToken.value == '}') {
+                                        braceCount--;
+                                        if (!braceCount) break
+                                    }
+
+                                    fnBody += this.currentToken.value;
+                                    this.eat();
+                                }
+
+                                if (!this.currentToken) throw Template_Error.toString("Unended '}'", { cause: "expected an '}'", code: "Template Error", lineNumber: line, columnNumber: col, filePath })
+
+                                const newFunction = new Function(...fnParams, fnBody)
+                                this.functions.define(fnName, newFunction);
+                                this.eat();
+                            } else throw Syntax_Error.toString("Expected '{'", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "{", actualValue: this.currentToken?.value })
+                        } else throw Syntax_Error.toString("Expected '('", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "(", actualValue: this.currentToken?.value })
+                    } else throw Syntax_Error.toString("Expected an function name", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "Function name", actualValue: this.currentToken?.value })
+
+                } else if (this.currentToken?.value == KEYWORDS.SERVE) {
 
                     this.eat()
 
@@ -368,8 +591,13 @@ export default class Parser {
                         if (poped?.type != TOKEN_TYPES.LPARENT) throw Template_Error.toString("Unclosed tag", { cause: `Unclosed token '${poped?.value}'`, code: "Template Format", lineNumber: poped?.line || -1, columnNumber: poped?.column || -1, filePath: poped?.filePath || '' })
 
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "(", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "Keyword 'as', 'return' or 'link'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-            }
+                } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "Keyword 'as', 'serve', 'fn' or 'link'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
+            } else if (this.currentToken.type == TOKEN_TYPES.ESCAPE) {
+
+                this.eat()
+                continue
+            } else throw Syntax_Error.toString("Expected a keyword", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "Keyword", actualValue: this.currentToken.value })
+
             this.eat();
         }
 
@@ -404,12 +632,23 @@ export default class Parser {
                 html += this.currentToken?.value;
                 this.eat()
                 continue
-            
-            }else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
+
+            } else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
                 html += this.currentToken?.value;
                 this.eat()
                 continue
             } else if (this.currentToken?.type == TOKEN_TYPES.OPENINGTAG) {
+
+                if (/^<style.*>$/.test(this.currentToken.value)) {
+                    html += this.skipStyle();
+                    continue;
+                }
+
+                if (/^<script.*>$/.test(this.currentToken.value)) {
+                    html += this.skipScript();
+                    continue;
+                }
+
                 this.stack.push(this.currentToken);
 
                 const componentMatch = this.currentToken?.value?.trim().match(/^<([a-zA-Z0-9_-]+)([^>]*)\/?>/);
@@ -512,33 +751,6 @@ export default class Parser {
                 }
 
                 const componentHtml = componentParser.updateParameters(componentParameters);
-                html += componentHtml || "";
-
-                this.eat()
-                continue
-
-            } else if (this.currentToken?.type == TOKEN_TYPES.COMPONENT) {
-
-                const componentSplitValue: string | undefined = this.currentToken?.value?.trim()?.match(/<\(([^)]+)\)>/)?.[1];
-
-                if (!componentSplitValue) throw new TypeError("Invalid component");
-
-                const componentName: string | undefined = componentSplitValue.match(/^([a-zA-Z0-9_-]+)/)?.[1]?.trim();
-
-                if (!componentName) throw new TypeError("Component name is undefined");
-
-                const componentParameters: Record<string, any> = {};
-                const attrRegex = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
-                let matchParameter: RegExpExecArray | null;
-
-                while ((matchParameter = attrRegex.exec(componentSplitValue)) !== null) {
-                    componentParameters[matchParameter[1]] = matchParameter[2];
-                }
-
-                const componentParser = this.scope.lookup(componentName);
-
-                const componentHtml = componentParser?.updateParameters(componentParameters);
-
                 html += componentHtml || "";
 
                 this.eat()
