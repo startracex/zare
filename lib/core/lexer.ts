@@ -359,18 +359,6 @@ export default class Lexer {
                 continue;
             }
 
-            // if (this.currentCharacter == "{") {
-            //     tokens.push({ type: TOKEN_TYPES.LCBRACE, value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath });
-            //     this.advance()
-            //     continue;
-            // }
-
-            // if (this.currentCharacter == "}") {
-            //     tokens.push({ type: TOKEN_TYPES.RCBRACE, value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath });
-            //     this.advance()
-            //     continue;
-            // }
-
             if (this.currentCharacter == "<") {
 
                 this.readComponent(tokens)
