@@ -1,6 +1,6 @@
 # Zare 
 
-<p align="center"><img src="./assets/w-icon.png" width="200px" /></p>
+<p align="center"><img src="./assets/icon.png" width="200px" /></p>
 
 A file-based component-based template engine for making your frontend more modular.
 
