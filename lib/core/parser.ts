@@ -97,25 +97,34 @@ export default class Parser {
     eval(condition: string) {
 
         try {
-            // Replace the parameter expressions with there actual value eg: @(user.name) => John Doe
-            let finalCondition = condition.replace(/@\(.*?\)/g, (match) => {
 
-                if (!this.parameters) return '';
+            condition = condition.trim().slice(1, -1)
+            
+            // if any function calls appear call them
+            condition = condition.replace(/[a-zA-Z0-9_]+\(([\s\S]*?)\)/g, (match) => {
 
-                const inner = match.slice(2, -1).trim();
+                const functionProperties = this.extractFunctionCallValues('@' + match.trim());
+                const fn = this.functions.lookup(functionProperties?.fnName);
 
-                const resolve = this.getValue(this.parameters, inner) ? `'${this.getValue(this.parameters, inner).trim()}'` : this.getValue(this.parameters, inner)
+                const result = fn(functionProperties?.fnArgs);
+                return result
+            } )
+            
+            // Replace the parameter expressions with there actual value eg: user.name => John Doe
+            condition = condition.replace(/[a-zA-Z0-9]+/g, (match) => {
 
-                return resolve;
+                if (!this.parameters) return match;
+
+                const fn = new Function(...Object.keys(this.parameters), `return ${match.trim()}`);
+                return fn(...Object.values(this.parameters))
             });
 
-            finalCondition = finalCondition.replace(/\((.*?)\)/, "$1"); // replace the `()` from finalCondition to avoid error
-
-            return eval(finalCondition)
+            // Final condition execution
+            const fn = new Function(...Object.keys(this.parameters || []), `return ${condition}`);
+            return fn(...Object.values(this.parameters || []));
         } catch (error) {
-            if (error instanceof Error && error.stack?.includes("eval")) {
-                throw Template_Error.toString(error.message, { cause: error.message, code: "Expression Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
-            }
+            if (error instanceof Error)
+            throw Template_Error.toString(error.message, { cause: error.message, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
         }
     }
 
