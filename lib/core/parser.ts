@@ -4,6 +4,7 @@ import Scope from "../utils/scope.js";
 import { TOKEN_TYPES } from "../constants/tokenTypes.js";
 import { KEYWORDS } from "../constants/keywords.js";
 import { Token } from "../types/token.js";
+import modules from "../modules/index.js";
 import fs from "fs";
 import path from "path";
 import Syntax_Error from "../errors/syntaxError.js";
@@ -375,7 +376,27 @@ export default class Parser {
 
             if (this.currentToken?.type == TOKEN_TYPES.KEYWORD) { // Check the keyword in the non return block
 
-                if (this.currentToken?.value == KEYWORDS.AS) {
+                if (this.currentToken?.value == KEYWORDS.USE) {
+
+                    this.eat();
+                    this.skipSpace();
+
+                    if (this.currentToken?.type == TOKEN_TYPES.TEXT) {
+
+                        const moduleName = this.currentToken.value;
+                        let methods;
+
+                        if (moduleName == "string") methods = modules.string;
+                        else throw Template_Error.toString("Unknown module usage", { cause: `Unknown module ${moduleName}`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+
+                        methods.forEach((method: { fnName: string, fnParams: string[], fnBody: string }) => {
+
+                            const fn = new Function(...method.fnParams, method.fnBody);
+                            this.functions.define(method.fnName, fn);
+                        })
+                    } else throw Syntax_Error.toString("Expected an identifier", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "identifier", actualValue: this.currentToken.value })
+
+                } else if (this.currentToken?.value == KEYWORDS.AS) {
 
                     this.eat()
 

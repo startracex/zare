@@ -4,6 +4,7 @@ export const KEYWORDS = {
     LINK: "link",
     CSS: "css",
     FN: "fn",
+    USE: "use",
     SERVE: "serve",
     IF: "@if",
     ELSE: "@else",
