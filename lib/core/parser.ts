@@ -243,8 +243,10 @@ export default class Parser {
                 current += char;
             } else if (char === ',' && depth === 0 && !inString) {
                 const trimmed = current.trim();
+                
                 if (/^[a-zA-Z0-9]+$/.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+                else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
                 else
                     fnArgs.push(trimmed);
 
@@ -257,11 +259,11 @@ export default class Parser {
         // Final arg
         if (current.trim() !== '') {
             const trimmed = current.trim();
-            if (/^[a-zA-Z0-9]+$/.test(trimmed)) {
-                fnArgs.push(this.getValue(this.parameters, trimmed) || '');
-            } else {
-                fnArgs.push(trimmed);
-            }
+            if (Number(trimmed)) fnArgs.push(trimmed)
+            else if (/^[a-zA-Z0-9]+$/.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+            else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
+            else fnArgs.push(trimmed);
+
         }
 
         return { fnName, fnArgs };
