@@ -548,7 +548,12 @@ export default class Parser {
 
                     } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "(", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                 } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "Keyword 'as', 'serve', 'fn' or 'link'", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-            }
+            } else if (this.currentToken.type == TOKEN_TYPES.ESCAPE) {
+
+                this.eat()
+                continue
+            } else throw Syntax_Error.toString("Expected a keyword", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath, expectedValue: "Keyword", actualValue: this.currentToken.value })
+
             this.eat();
         }
 
