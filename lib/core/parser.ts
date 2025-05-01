@@ -391,6 +391,7 @@ export default class Parser {
                         if (moduleName == "string") methods = modules.string;
                         else if (moduleName == "number") methods = modules.number;
                         else if (moduleName == "date") methods = modules.date;
+                        else if (moduleName == "math") methods = modules.math;
                         else throw Template_Error.toString("Unknown module usage", { cause: `Unknown module ${moduleName}`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
 
                         methods.forEach((method: { fnName: string, fnParams: string[], fnBody: string }) => {
