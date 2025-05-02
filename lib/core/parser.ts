@@ -100,7 +100,7 @@ export default class Parser {
         try {
 
             condition = condition.trim().slice(1, -1)
-            
+
             // if any function calls appear call them
             condition = condition.replace(/[a-zA-Z0-9_]+\(([\s\S]*?)\)/g, (match) => {
 
@@ -109,8 +109,8 @@ export default class Parser {
 
                 const result = fn(functionProperties?.fnArgs);
                 return result
-            } )
-            
+            })
+
             // Replace the parameter expressions with there actual value eg: user.name => John Doe
             condition = condition.replace(/[a-zA-Z0-9]+/g, (match) => {
 
@@ -125,7 +125,7 @@ export default class Parser {
             return fn(...Object.values(this.parameters || []));
         } catch (error) {
             if (error instanceof Error)
-            throw Template_Error.toString(error.message, { cause: error.message, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
+                throw Template_Error.toString(error.message, { cause: error.message, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath })
         }
     }
 
@@ -633,6 +633,12 @@ export default class Parser {
                 this.eat()
                 continue
 
+            } else if (this.currentToken.type == TOKEN_TYPES.FUNCTIONCALL) {
+                const functionProperties = this.extractFunctionCallValues(this.currentToken.value);
+                const fn = this.functions.lookup(functionProperties === null || functionProperties === void 0 ? void 0 : functionProperties.fnName);
+                html += fn(...(functionProperties === null || functionProperties === void 0 ? void 0 : functionProperties.fnArgs) || []);
+                this.eat();
+                continue;
             } else if (this.currentToken?.type == TOKEN_TYPES.DOCTYPE) {
                 html += this.currentToken?.value;
                 this.eat()
