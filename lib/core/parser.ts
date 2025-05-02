@@ -107,7 +107,7 @@ export default class Parser {
                 const functionProperties = this.extractFunctionCallValues('@' + match.trim());
                 const fn = this.functions.lookup(functionProperties?.fnName);
 
-                const result = fn(functionProperties?.fnArgs);
+                const result = fn(...functionProperties?.fnArgs || []);
                 return result
             })
 
@@ -264,7 +264,8 @@ export default class Parser {
             } else if (char === ',' && depth === 0 && !inString) {
                 const trimmed = current.trim();
 
-                if (/^[a-zA-Z0-9]+$/.test(trimmed))
+                if (Number(trimmed)) fnArgs.push(trimmed);
+                else if (/^[a-zA-Z0-9]+$/.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
                 else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
                 else
