@@ -152,7 +152,7 @@ export default class Lexer {
             this.advance();
         }
 
-        if (!this.currentCharacter) console.log("Error here");
+        if (!this.currentCharacter) throw Template_Error.toString("Unclosed '('", { cause: "Unclosed '('", code: "Template Error", lineNumber: this.line, columnNumber: this.column, filePath: this.filePath })
 
         if (/@([a-zA-Z0-9]+)\(([^)]*)\)/.test(value)) {
             tokens.push({ type: TOKEN_TYPES.FUNCTIONCALL, value: value.trim(), line: this.line, column: this.column, filePath: this.filePath });
