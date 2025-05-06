@@ -52,7 +52,7 @@ export default class Lexer {
             this.advance()
         }
 
-        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.CSS, KEYWORDS.SERVE, KEYWORDS.USE].includes(value) && !this.isReturnBlock) {
+        if ([KEYWORDS.AS, KEYWORDS.IMPORT, KEYWORDS.LINK, KEYWORDS.FN, KEYWORDS.SERVE, KEYWORDS.USE].includes(value) && !this.isReturnBlock) {
             tokens.push({ type: TOKEN_TYPES.KEYWORD, value: value, line: this.line, column: this.column, filePath: this.filePath });
             if (value.trim() == KEYWORDS.SERVE) this.isReturnBlock = true;
         } else {
