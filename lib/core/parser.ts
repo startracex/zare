@@ -539,7 +539,7 @@ export default class Parser {
                                 this.skipSpace();
                                 if (this.currentToken.type == TOKEN_TYPES.LPARENT) parentCount++;
                                 else if (this.currentToken.type == TOKEN_TYPES.RPARENT) parentCount--;
-                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.trim());
+                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.replace(",", "").trim());
                                 this.eat();
                             }
 
