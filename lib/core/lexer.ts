@@ -156,7 +156,6 @@ export default class Lexer {
 
         if (/@([a-zA-Z0-9]+)\(([^)]*)\)/.test(value)) {
             tokens.push({ type: TOKEN_TYPES.FUNCTIONCALL, value: value.trim(), line: this.line, column: this.column, filePath: this.filePath });
-            this.advance();
             return true;
         }
 
