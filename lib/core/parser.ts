@@ -463,7 +463,7 @@ export default class Parser {
                             this.eat()
                             this.skipSpace()
 
-                            if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"\.\/.*"$/.test(this.currentToken?.value)) {
+                            if (this.currentToken?.type == TOKEN_TYPES.STRING && /"(\.?\.?(\/[\w.\- ]+)*\/?|\.{1,2})"/.test(this.currentToken?.value)) {
 
                                 const content: string = fs.readFileSync(path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")), "utf-8");
 
