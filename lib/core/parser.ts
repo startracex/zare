@@ -194,7 +194,7 @@ export default class Parser {
 
         arr.forEach((e, _i) => {
 
-            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope);
+            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope, undefined, undefined, this.functions);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -707,7 +707,7 @@ export default class Parser {
                 this.stack.pop();
                 this.eat(); // Eat the closing tag
 
-                const slotParser = new Parser(slotTokens, this.parameters, this.__view, this.scope);
+                const slotParser = new Parser(slotTokens, this.parameters, this.__view, this.scope, undefined, undefined, this.functions);
                 const slotWithParameters = slotParser.htmlParser('');
 
                 componentParameters.slot = slotWithParameters;
