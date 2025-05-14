@@ -194,7 +194,7 @@ export default class Parser {
 
         arr.forEach((e, _i) => {
 
-            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope, undefined, undefined, this.functions);
+            const parser: Parser = new Parser(tokens, { [key]: e, _i, ...this.parameters }, this.__view, this.scope, undefined, undefined, this.functions);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -265,7 +265,7 @@ export default class Parser {
                 const trimmed = current.trim();
 
                 if (Number(trimmed)) fnArgs.push(trimmed);
-                else if (/^[a-zA-Z0-9]+$/.test(trimmed))
+                else if (/^[a-zA-Z0-9.]+$/.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
                 else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
                 else
@@ -281,7 +281,7 @@ export default class Parser {
         if (current.trim() !== '') {
             const trimmed = current.trim();
             if (Number(trimmed)) fnArgs.push(trimmed)
-            else if (/^[a-zA-Z0-9]+$/.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+            else if (/^[a-zA-Z0-9.]+$/.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
             else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
             else fnArgs.push(trimmed);
 
