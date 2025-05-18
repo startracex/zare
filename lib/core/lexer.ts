@@ -3,6 +3,16 @@ import { KEYWORDS } from "../constants/keywords.js";
 import { Token } from "../types/token.js";
 import Template_Error from "../errors/templateError.js";
 
+const WHITESPACE_REGEX: RegExp = /[\t\n\r\f\v ]/;
+const DOCTYPE_REGEX = /^<!DOCTYPE.*>$/;
+const CLOSINGTAG_REGEX = /^<\/.*>$/;
+const SELFCLOSINGTAG_REGEX = /^<.*\/>$/;
+const OPENINGTAG_REGEX = /^<.*>$/;
+const FUNCTION_CALL_REGEX = /@([a-zA-Z0-9]+)\(([^)]*)\)/;
+const PARAMETERS_REGEX = /^@\(.*\)$/;
+const KEYWORDS_REGEX= /^[a-zA-Z0-9]+$/;
+const STRING_DELIMITER_REGEX = /['"`]/;
+
 export default class Lexer {
 
     position: number;
@@ -46,7 +56,7 @@ export default class Lexer {
 
         let value: string = '';
 
-        while (this.currentCharacter && !/[\t\n\r\f\v ]/.test(this.currentCharacter) && this.currentCharacter !== "<" && this.currentCharacter !== ")") {
+        while (this.currentCharacter && !WHITESPACE_REGEX.test(this.currentCharacter) && this.currentCharacter !== "<" && this.currentCharacter !== ")") {
 
             value += this.currentCharacter;
             this.advance()
@@ -120,10 +130,10 @@ export default class Lexer {
         this.advance()
 
         if (word == "<") tokens.push({ type: TOKEN_TYPES.LESSTHAN, value: word, line: this.line, column: this.column, filePath: this.filePath })
-        else if (/^<!DOCTYPE.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.DOCTYPE, value: word, line: this.line, column: this.column, filePath: this.filePath })
-        else if (/^<\/.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.CLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
-        else if (/^<.*\/>$/.test(word)) tokens.push({ type: TOKEN_TYPES.SELFCLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
-        else if (/^<.*>$/.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
+        else if (DOCTYPE_REGEX.test(word)) tokens.push({ type: TOKEN_TYPES.DOCTYPE, value: word, line: this.line, column: this.column, filePath: this.filePath })
+        else if (CLOSINGTAG_REGEX.test(word)) tokens.push({ type: TOKEN_TYPES.CLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
+        else if (SELFCLOSINGTAG_REGEX.test(word)) tokens.push({ type: TOKEN_TYPES.SELFCLOSINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
+        else if (OPENINGTAG_REGEX.test(word)) tokens.push({ type: TOKEN_TYPES.OPENINGTAG, value: word, line: this.line, column: this.column, filePath: this.filePath })
     }
 
     /**
@@ -154,7 +164,7 @@ export default class Lexer {
 
         if (!this.currentCharacter) throw Template_Error.toString("Unclosed '('", { cause: "Unclosed '('", code: "Template Error", lineNumber: this.line, columnNumber: this.column, filePath: this.filePath })
 
-        if (/@([a-zA-Z0-9]+)\(([^)]*)\)/.test(value)) {
+        if (FUNCTION_CALL_REGEX.test(value)) {
             tokens.push({ type: TOKEN_TYPES.FUNCTIONCALL, value: value.trim(), line: this.line, column: this.column, filePath: this.filePath });
             return true;
         }
@@ -182,7 +192,7 @@ export default class Lexer {
         if (!this.currentCharacter) throw Template_Error.toString("Unended parameter expression", { cause: "Unended parameter expression", code: "Template Format", lineNumber: line, columnNumber: col, filePath: this.filePath })
 
         this.advance()
-        if (/^@\(.*\)$/.test(word)) tokens.push({ type: TOKEN_TYPES.PARAMETEREXPRESSION, value: word, line: this.line, column: this.column, filePath: this.filePath });
+        if (PARAMETERS_REGEX.test(word)) tokens.push({ type: TOKEN_TYPES.PARAMETEREXPRESSION, value: word, line: this.line, column: this.column, filePath: this.filePath });
     }
 
     /**
@@ -222,7 +232,7 @@ export default class Lexer {
         this.advance();
         this.advance();
 
-        while (/[\t\n\r\f\v ]/.test(this.currentCharacter)) this.advance()
+        while (WHITESPACE_REGEX.test(this.currentCharacter)) this.advance()
 
         let condition: string = this.currentCharacter;
         let parentCount: number = 1;
@@ -231,7 +241,7 @@ export default class Lexer {
 
         while (this.currentCharacter && parentCount > 0) {
 
-            if (/[\t\n\r\f\v ]/.test(this.currentCharacter)) {
+            if (WHITESPACE_REGEX.test(this.currentCharacter)) {
                 this.advance()
                 continue;
             }
@@ -250,7 +260,7 @@ export default class Lexer {
 
         tokens.push({ type: TOKEN_TYPES.CONDITION, value: condition, line: this.line, column: this.column, filePath: this.filePath })
 
-        while (/[\t\n\r\f\v ]/.test(this.currentCharacter)) this.advance()
+        while (WHITESPACE_REGEX.test(this.currentCharacter)) this.advance()
 
         if (this.currentCharacter == "{") {
 
@@ -273,7 +283,7 @@ export default class Lexer {
         this.advance();
         this.advance();
 
-        while (/[\t\n\r\f\v ]/.test(this.currentCharacter)) this.advance()
+        while (WHITESPACE_REGEX.test(this.currentCharacter)) this.advance()
 
         if (this.currentCharacter == "{") {
 
@@ -296,7 +306,7 @@ export default class Lexer {
         this.advance();
         this.advance();
 
-        while (/[\t\n\r\f\v ]/.test(this.currentCharacter)) this.advance()
+        while (WHITESPACE_REGEX.test(this.currentCharacter)) this.advance()
 
         let eachExpression: string = this.currentCharacter;
         let parentCount: number = 1;
@@ -305,7 +315,7 @@ export default class Lexer {
 
         while (this.currentCharacter && parentCount > 0) {
 
-            if (/[\t\n\r\f\v ]/.test(this.currentCharacter)) {
+            if (WHITESPACE_REGEX.test(this.currentCharacter)) {
                 this.advance()
                 continue;
             }
@@ -324,7 +334,7 @@ export default class Lexer {
 
         tokens.push({ type: TOKEN_TYPES.EACHEXPRESSION, value: eachExpression, line: this.line, column: this.column, filePath: this.filePath })
 
-        while (/[\t\n\r\f\v ]/.test(this.currentCharacter)) this.advance()
+        while (WHITESPACE_REGEX.test(this.currentCharacter)) this.advance()
 
         if (this.currentCharacter == "{") {
 
@@ -348,7 +358,7 @@ export default class Lexer {
         while (this.position < this.code.length) {
 
             // Skip the spaces, tabs and Whitespaces
-            if (/[\t\n\r\f\v ]/.test(this.currentCharacter)) {
+            if (WHITESPACE_REGEX.test(this.currentCharacter)) {
 
                 tokens.push({ type: TOKEN_TYPES.ESCAPE, value: this.currentCharacter, line: this.line, column: this.column, filePath: this.filePath })
                 this.advance()
@@ -382,14 +392,14 @@ export default class Lexer {
             }
 
             // Handling alphabats for keywords and text
-            if (/^[a-zA-Z0-9]+$/.test(this.currentCharacter)) {
+            if (KEYWORDS_REGEX.test(this.currentCharacter)) {
 
                 this.readKeywordsOrText(tokens)
                 continue;
             }
 
             // Checking if the current character starts with ( `, ', " ) if yes then call the readString()
-            if (/['"`]/.test(this.currentCharacter)) {
+            if (STRING_DELIMITER_REGEX.test(this.currentCharacter)) {
 
                 this.readString(tokens)
                 continue;
