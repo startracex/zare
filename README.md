@@ -1,6 +1,7 @@
-# Zare 
-
 <p align="center"><img src="./assets/icon.png" width="200px" /></p>
+<p align="center"><img alt="NPM Version" src="https://img.shields.io/npm/v/zare"> <img src="https://img.shields.io/npm/dm/zare"/> <a href="https://x.com/ZareJs"><img src="https://img.shields.io/badge/X-000000?logo=x&logoColor=white"/></a> <a href="https://discord.gg/HB63mRPVZt"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white"/></a> <a href="https://www.reddit.com/r/Zare/"><img src="https://img.shields.io/badge/Reddit-FF4500?logo=reddit&logoColor=white"/></a></p>
+
+# Zare⚡
 
 A file-based component-based template engine for making your frontend more modular.
 
@@ -46,7 +47,7 @@ To start using the project, follow these steps:
 3. Create a index.zare file in views folder and paste
     ```zare
     // views/index.zare
-    return (
+    serve (
         <h1>Hello, @(text)</h1>
     )
     ```
@@ -63,7 +64,7 @@ To start using the project, follow these steps:
 ## Example
 
 ```zare
-    return (
+    serve (
         <p>Welcome To Zare</p>
     )
 ```

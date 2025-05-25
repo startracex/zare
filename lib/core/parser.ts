@@ -10,6 +10,27 @@ import path from "path";
 import Syntax_Error from "../errors/syntaxError.js";
 import Template_Error from "../errors/templateError.js";
 
+const REGEX_ARRAY_INDEX = /\[(\w+)\]/g; 
+const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
+const REGEX_SINGLE_QUOTE_KEY = /\['(.*?)'\]/g;
+const REGEX_FUNCTION_CALL = /[a-zA-Z0-9_]+\(([\s\S]*?)\)/g;
+const REGEX_PARAMETER_EXPRESSION = /[a-zA-Z0-9]+/g;
+const REGEX_FN_CALL_EXTRACT = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
+const REGEX_COMPONENT_ATTR = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+const REGEX_OPENING_TAG = /^<([a-zA-Z0-9_-]+)([^>]*)\/?>/;
+const REGEX_CLOSING_TAG = /^<\/([a-zA-Z0-9]+)>/;
+const REGEX_SELF_CLOSING_TAG = /^<([^\s>\/]+)/;
+const REGEX_STYLE_TAG = /^<style.*>$/;
+const REGEX_SCRIPT_TAG = /^<script.*>$/;
+const REGEX_END_STYLE_TAG = /^<\/.*style>$/;
+const REGEX_END_SCRIPT_TAG = /^<\/.*script>$/;
+const REGEX_HEAD_TAG = /<head[^>]*>/i;
+const REGEX_PATH_STRING = /"(\.?\.?(\/[\w.\- ]+)*\/?|\.{1,2})"/;
+const REGEX_CSS_PATH = /^"(\.?\/.*)"$/;
+const REGEX_JS_PATH = /^"(\.?\/.*)"$/;
+const REGEX_FN_PARAMS = /^[a-zA-Z0-9.]+$/;
+const REGEX_EACH_EXPRESSION = /\((.*?)\)/;
+
 export default class Parser {
 
     position: number;
@@ -68,9 +89,9 @@ export default class Parser {
         try {
 
             const keys = path
-                .replace(/\[(\w+)\]/g, '.$1')       // convert [0] to .0 or ["name"] to .name
-                .replace(/\["(.*?)"\]/g, '.$1')     // convert ["name"] to .name
-                .replace(/\['(.*?)'\]/g, '.$1')     // convert ['name'] to .name
+                .replace(REGEX_ARRAY_INDEX, '.$1')       // convert [0] to .0 or ["name"] to .name
+                .replace(REGEX_DOUBLE_QUOTE_KEY, '.$1')     // convert ["name"] to .name
+                .replace(REGEX_SINGLE_QUOTE_KEY, '.$1')     // convert ['name'] to .name
                 .split('.');
 
             return keys.reduce((acc, key) => {
@@ -102,7 +123,7 @@ export default class Parser {
             condition = condition.trim().slice(1, -1)
 
             // if any function calls appear call them
-            condition = condition.replace(/[a-zA-Z0-9_]+\(([\s\S]*?)\)/g, (match) => {
+            condition = condition.replace(REGEX_FUNCTION_CALL, (match) => {
 
                 const functionProperties = this.extractFunctionCallValues('@' + match.trim());
                 const fn = this.functions.lookup(functionProperties?.fnName);
@@ -112,7 +133,7 @@ export default class Parser {
             })
 
             // Replace the parameter expressions with there actual value eg: user.name => John Doe
-            condition = condition.replace(/[a-zA-Z0-9]+/g, (match) => {
+            condition = condition.replace(REGEX_PARAMETER_EXPRESSION, (match) => {
 
                 if (!this.parameters) return match;
 
@@ -194,7 +215,7 @@ export default class Parser {
 
         arr.forEach((e, _i) => {
 
-            const parser: Parser = new Parser(tokens, { [key]: e, _i }, this.__view, this.scope);
+            const parser: Parser = new Parser(tokens, { [key]: e, _i, ...this.parameters }, this.__view, this.scope, undefined, undefined, this.functions);
             const parsed: string = parser.htmlParser('');
 
             html += parser.parameterExecuter(parsed);
@@ -230,7 +251,7 @@ export default class Parser {
      * input value.
      */
     extractFunctionCallValues(value: string) {
-        const regex = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
+        const regex = REGEX_FN_CALL_EXTRACT;
         const match = value.match(regex);
 
         if (!match) return null;
@@ -265,7 +286,7 @@ export default class Parser {
                 const trimmed = current.trim();
 
                 if (Number(trimmed)) fnArgs.push(trimmed);
-                else if (/^[a-zA-Z0-9]+$/.test(trimmed))
+                else if (REGEX_FN_PARAMS.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
                 else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
                 else
@@ -281,7 +302,7 @@ export default class Parser {
         if (current.trim() !== '') {
             const trimmed = current.trim();
             if (Number(trimmed)) fnArgs.push(trimmed)
-            else if (/^[a-zA-Z0-9]+$/.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+            else if (REGEX_FN_PARAMS.test(trimmed)) fnArgs.push(this.getValue(this.parameters, trimmed) || '');
             else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
             else fnArgs.push(trimmed);
 
@@ -300,7 +321,7 @@ export default class Parser {
         let value: string = '';
         const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
 
-        while (this.currentToken && !/^<\/.*style>$/.test(this.currentToken.value)) {
+        while (this.currentToken && !REGEX_END_STYLE_TAG.test(this.currentToken.value)) {
             value += this.currentToken.value;
             this.eat();
         }
@@ -325,7 +346,7 @@ export default class Parser {
         let value: string = '';
         const line: number = this.currentToken.line, col: number = this.currentToken.column, filePath: string = this.currentToken.filePath
 
-        while (this.currentToken && !/^<\/.*script>$/.test(this.currentToken.value)) {
+        while (this.currentToken && !REGEX_END_SCRIPT_TAG.test(this.currentToken.value)) {
             value += this.currentToken.value;
             this.eat();
         }
@@ -353,7 +374,7 @@ export default class Parser {
         // Link js files
         this.script.forEach((value: string) => {
 
-            const headTagMatch = html.match(/<head[^>]*>/i);
+            const headTagMatch = html.match(REGEX_HEAD_TAG);
 
             if (!headTagMatch) {
                 throw Template_Error.toString("Head tag not found", {
@@ -381,7 +402,7 @@ export default class Parser {
         // Link css files
         this.linker.forEach((value: string) => {
 
-            const headTagMatch = html.match(/<head[^>]*>/i);
+            const headTagMatch = html.match(REGEX_HEAD_TAG);
 
             if (!headTagMatch) {
                 throw Template_Error.toString("Head tag not found", {
@@ -463,7 +484,7 @@ export default class Parser {
                             this.eat()
                             this.skipSpace()
 
-                            if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"\.\/.*"$/.test(this.currentToken?.value)) {
+                            if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_PATH_STRING.test(this.currentToken?.value)) {
 
                                 const content: string = fs.readFileSync(path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")), "utf-8");
 
@@ -489,7 +510,7 @@ export default class Parser {
                         this.eat();
                         this.skipSpace();
 
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"(\.?\/.*)"$/.test(this.currentToken?.value)) {
+                        if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_CSS_PATH.test(this.currentToken?.value)) {
                             const cssPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
                             this.linker.parent ? this.linker.parent.define(cssName, cssPath) : this.linker.define(cssName, cssPath)
@@ -507,7 +528,7 @@ export default class Parser {
                         this.eat();
                         this.skipSpace();
 
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && /^"(\.?\/.*)"$/.test(this.currentToken?.value)) {
+                        if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_JS_PATH.test(this.currentToken?.value)) {
                             const jsPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
                             this.script.parent ? this.script.parent.define(jsName, jsPath) : this.script.define(jsName, jsPath)
@@ -539,7 +560,7 @@ export default class Parser {
                                 this.skipSpace();
                                 if (this.currentToken.type == TOKEN_TYPES.LPARENT) parentCount++;
                                 else if (this.currentToken.type == TOKEN_TYPES.RPARENT) parentCount--;
-                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.trim());
+                                if (this.currentToken.type == TOKEN_TYPES.TEXT) fnParams.push(this.currentToken.value.replace(",", "").trim());
                                 this.eat();
                             }
 
@@ -646,19 +667,19 @@ export default class Parser {
                 continue
             } else if (this.currentToken?.type == TOKEN_TYPES.OPENINGTAG) {
 
-                if (/^<style.*>$/.test(this.currentToken.value)) {
+                if (REGEX_STYLE_TAG.test(this.currentToken.value)) {
                     html += this.skipStyle();
                     continue;
                 }
 
-                if (/^<script.*>$/.test(this.currentToken.value)) {
+                if (REGEX_SCRIPT_TAG.test(this.currentToken.value)) {
                     html += this.skipScript();
                     continue;
                 }
 
                 this.stack.push(this.currentToken);
 
-                const componentMatch = this.currentToken?.value?.trim().match(/^<([a-zA-Z0-9_-]+)([^>]*)\/?>/);
+                const componentMatch = this.currentToken?.value?.trim().match(REGEX_OPENING_TAG);
                 const componentName = componentMatch?.[1];
                 const rawAttributes = componentMatch?.[2];
 
@@ -674,7 +695,7 @@ export default class Parser {
 
                 // Extract attributes
                 const componentParameters: Record<string, any> = {};
-                const attrRegex = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+                const attrRegex = REGEX_COMPONENT_ATTR;
                 let matchParameter: RegExpExecArray | null;
 
                 while ((matchParameter = attrRegex.exec(rawAttributes || '')) !== null) {
@@ -688,7 +709,7 @@ export default class Parser {
                 const slotTokens: Token[] = [];
                 while (
                     this.currentToken &&
-                    this.currentToken.value.match(/^<\/([a-zA-Z0-9_-]+)>/)?.[1].trim() !== componentName
+                    this.currentToken.value.match(REGEX_CLOSING_TAG)?.[1].trim() !== componentName
                 ) {
                     slotTokens.push(this.currentToken);
                     this.eat();
@@ -707,7 +728,7 @@ export default class Parser {
                 this.stack.pop();
                 this.eat(); // Eat the closing tag
 
-                const slotParser = new Parser(slotTokens, this.parameters, this.__view, this.scope);
+                const slotParser = new Parser(slotTokens, this.parameters, this.__view, this.scope, undefined, undefined, this.functions);
                 const slotWithParameters = slotParser.htmlParser('');
 
                 componentParameters.slot = slotWithParameters;
@@ -724,8 +745,8 @@ export default class Parser {
 
             } else if (this.currentToken?.type == TOKEN_TYPES.CLOSINGTAG) {
 
-                const openingTag = this.stack.pop()?.value?.match(/^<([a-zA-Z0-9]+)/)?.[1];
-                const closingTag = this.currentToken?.value.match(/^<\/([a-zA-Z0-9]+)>/)?.[1];
+                const openingTag = this.stack.pop()?.value?.match(REGEX_OPENING_TAG)?.[1];
+                const closingTag = this.currentToken?.value.match(REGEX_CLOSING_TAG)?.[1];
 
                 if (!openingTag) throw Template_Error.toString("Template Format", { cause: `Unwanted tag </${closingTag}>`, code: "Format Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath });
                 if (openingTag !== closingTag) throw Template_Error.toString(`expecting the closing tag for ${openingTag} but got ${closingTag}`, { cause: `expecting the closing tag for ${openingTag} but got ${closingTag}`, code: "Template Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, filePath: this.currentToken.filePath });
@@ -739,7 +760,7 @@ export default class Parser {
 
                 const componentSplitValue: string | undefined = this.currentToken?.value?.trim();
 
-                const componentName: string | undefined = componentSplitValue?.match(/^<([^\s>\/]+)/)?.[1];
+                const componentName: string | undefined = componentSplitValue?.match(REGEX_SELF_CLOSING_TAG)?.[1];
 
                 const componentParser = this.scope.lookup(componentName);
 
@@ -750,7 +771,7 @@ export default class Parser {
                 }
 
                 const componentParameters: Record<string, any> = {};
-                const attrRegex = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+                const attrRegex = REGEX_COMPONENT_ATTR;
                 let matchParameter: RegExpExecArray | null;
 
                 while ((matchParameter = attrRegex.exec(componentSplitValue || '')) !== null) {
@@ -805,7 +826,7 @@ export default class Parser {
 
                 if (this.currentToken?.type == TOKEN_TYPES.EACHEXPRESSION) {
 
-                    const [arr, val]: string[] = this.currentToken.value.replace(/\((.*?)\)/, "$1").split(":");
+                    const [arr, val]: string[] = this.currentToken.value.replace(REGEX_EACH_EXPRESSION, "$1").split(":");
                     this.eat()
 
                     if (this.currentToken?.type == TOKEN_TYPES.CODEBLOCK) {
