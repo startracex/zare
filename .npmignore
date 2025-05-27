@@ -4,3 +4,4 @@ tsconfig.json
 coverage
 tests
 vitest.config.ts
+.husky
