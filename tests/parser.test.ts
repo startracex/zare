@@ -410,7 +410,7 @@ describe('Parser', () => {
 
         it("should display username in if block", () => {
             const testCode = `serve (
-            @if ("user") {
+            @if (user) {
                 @(user)
             }
             )`;
