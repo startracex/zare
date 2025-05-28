@@ -132,15 +132,6 @@ export default class Parser {
                 return result
             })
 
-            // Replace the parameter expressions with there actual value eg: user.name => John Doe
-            condition = condition.replace(REGEX_PARAMETER_EXPRESSION, (match) => {
-
-                if (!this.parameters) return match;
-
-                const fn = new Function(...Object.keys(this.parameters), `return ${match.trim()}`);
-                return fn(...Object.values(this.parameters))
-            });
-
             // Final condition execution
             const fn = new Function(...Object.keys(this.parameters || []), `return ${condition}`);
             return fn(...Object.values(this.parameters || []));
