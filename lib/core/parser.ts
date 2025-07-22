@@ -10,7 +10,7 @@ import path from "path";
 import Syntax_Error from "../errors/syntaxError.js";
 import Template_Error from "../errors/templateError.js";
 
-const REGEX_ARRAY_INDEX = /\[(\w+)\]/g; 
+const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
 const REGEX_SINGLE_QUOTE_KEY = /\['(.*?)'\]/g;
 const REGEX_FUNCTION_CALL = /[a-zA-Z0-9_]+\(([\s\S]*?)\)/g;
@@ -557,7 +557,6 @@ export default class Parser {
 
                             if (!this.currentToken) throw Syntax_Error.toString("Expected a closing parenthesis", { code: "Syntax Error", lineNumber: line, columnNumber: col, filePath, expectedValue: ")", actualValue: 'EOF' });
 
-                            this.eat();
                             this.skipSpace();
 
                             if (this.currentToken.value == '{') {
