@@ -1,6 +1,6 @@
 {
   "name": "zare",
-  "version": "2.1.5",
+  "version": "2.1.8",
   "description": "A file base component template engine",
   "main": "dist/index.js",
   "type": "module",
@@ -27,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/IsmailBinMujeeb/zare/issues"
   },
-  "homepage": "https://github.com/IsmailBinMujeeb/zare#readme",
+  "homepage": "https://zare-js.hashnode.space/",
   "devDependencies": {
     "@commitlint/config-conventional": "^19.8.1",
     "@semantic-release/changelog": "^6.0.3",
