@@ -10,7 +10,7 @@ const SELFCLOSINGTAG_REGEX = /^<.*\/>$/;
 const OPENINGTAG_REGEX = /^<.*>$/;
 const FUNCTION_CALL_REGEX = /@([a-zA-Z0-9]+)\(([^)]*)\)/;
 const PARAMETERS_REGEX = /^@\(.*\)$/;
-const KEYWORDS_REGEX= /^[a-zA-Z0-9]+$/;
+const KEYWORDS_REGEX = /^[a-zA-Z0-9]+$/;
 const STRING_DELIMITER_REGEX = /['"`]/;
 
 export default class Lexer {
@@ -56,7 +56,7 @@ export default class Lexer {
 
         let value: string = '';
 
-        while (this.currentCharacter && !WHITESPACE_REGEX.test(this.currentCharacter) && this.currentCharacter !== "<" && this.currentCharacter !== ")") {
+        while (this.currentCharacter && !WHITESPACE_REGEX.test(this.currentCharacter) && this.currentCharacter !== "<" && this.currentCharacter !== ")" && this.currentCharacter !== "(") {
 
             value += this.currentCharacter;
             this.advance()
