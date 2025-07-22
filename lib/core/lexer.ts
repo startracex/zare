@@ -255,8 +255,6 @@ export default class Lexer {
         }
 
         if (!this.currentCharacter) throw Template_Error.toString("Unended parenthesis ')'", { cause: "Unended parenthesis ')'", code: "Template Format", lineNumber: line, columnNumber: col, filePath: this.filePath })
-        condition += this.currentCharacter;
-        this.advance()
 
         tokens.push({ type: TOKEN_TYPES.CONDITION, value: condition, line: this.line, column: this.column, filePath: this.filePath })
 
