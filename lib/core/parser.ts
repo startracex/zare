@@ -498,37 +498,23 @@ export default class Parser {
                     this.eat();
                     this.skipSpace();
 
-                    if (this.currentToken?.type == TOKEN_TYPES.TEXT) {
+                    if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_CSS_PATH.test(this.currentToken?.value)) {
+                        const cssPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
-                        const cssName = this.currentToken.value.trim();
-                        this.eat();
-                        this.skipSpace();
-
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_CSS_PATH.test(this.currentToken?.value)) {
-                            const cssPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
-
-                            this.linker.parent ? this.linker.parent.define(cssName, cssPath) : this.linker.define(cssName, cssPath)
-                            this.eat()
-                        } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                    } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
+                        this.linker.parent ? this.linker.parent.define(cssPath, cssPath) : this.linker.define(cssPath, cssPath)
+                        this.eat()
+                    } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                 } else if (this.currentToken?.type == TOKEN_TYPES.KEYWORD && this.currentToken?.value == KEYWORDS.IMPORT) {
 
                     this.eat();
                     this.skipSpace();
 
-                    if (this.currentToken?.type == TOKEN_TYPES.TEXT) {
+                    if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_JS_PATH.test(this.currentToken?.value)) {
+                        const jsPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
 
-                        const jsName = this.currentToken.value.trim();
-                        this.eat();
-                        this.skipSpace();
-
-                        if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_JS_PATH.test(this.currentToken?.value)) {
-                            const jsPath: string = this.currentToken?.value.replace(`"`, "").replace(`"`, "")
-
-                            this.script.parent ? this.script.parent.define(jsName, jsPath) : this.script.define(jsName, jsPath)
-                            this.eat()
-                        } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
-                    } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "'css' keyword", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
+                        this.script.parent ? this.script.parent.define(jsPath, jsPath) : this.script.define(jsPath, jsPath)
+                        this.eat()
+                    } else throw Syntax_Error.toString("Syntax Error", { code: "Syntax Error", lineNumber: this.currentToken.line, columnNumber: this.currentToken.column, expectedValue: "file path", actualValue: this.currentToken.value, filePath: this.currentToken.filePath })
                 } else if (this.currentToken?.value == KEYWORDS.FN) {
 
                     this.eat();
