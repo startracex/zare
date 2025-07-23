@@ -4,42 +4,35 @@
   "description": "A file base component template engine",
   "main": "dist/index.js",
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsc",
     "dev": "node dist/index.js",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "prepare": "husky",
-    "release": "semantic-release"
+    "changeset": "changeset"
   },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@types/node": "^24.1.0",
+    "@vitest/coverage-v8": "^3.1.4",
+    "commitlint": "^19.8.1",
+    "husky": "^9.1.7",
+    "vitest": "^3.1.4"
+  },
+  "files": [
+    "lib",
+    "dist"
+  ],
   "author": "@IsmailBinMujeeb (ismailbinmujeeb@gmail.com)",
   "license": "MIT",
-  "dependencies": {
-    "@types/node": "^22.14.1"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IsmailBinMujeeb/zare.git"
+    "url": "git+https://github.com/IsmailBinMujeeb/zare.git"
   },
   "bugs": {
     "url": "https://github.com/IsmailBinMujeeb/zare/issues"
   },
-  "homepage": "https://zare-js.hashnode.space/",
-  "devDependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.3",
-    "@semantic-release/npm": "^12.0.1",
-    "@semantic-release/release-notes-generator": "^14.0.3",
-    "@vitest/coverage-v8": "^3.1.4",
-    "commitlint": "^19.8.1",
-    "husky": "^9.1.7",
-    "semantic-release": "^24.2.5",
-    "vitest": "^3.1.4"
-  }
+  "homepage": "https://zare-js.hashnode.space/"
 }
