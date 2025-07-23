@@ -379,7 +379,8 @@ export default class Parser {
 
             const titleTagIndex = html.indexOf('</title>');
 
-            const jsScriptTag = `\n<script src="${value}.js" defer/></script>`;
+            const resolvedValue = value.endsWith(".js") ? value : `${value}.js`
+            const jsScriptTag = `\n<script src="${resolvedValue}" defer/></script>`;
 
             if (titleTagIndex !== -1) {
                 const insertPosition = titleTagIndex + '</title>'.length;
@@ -407,7 +408,8 @@ export default class Parser {
 
             const titleTagIndex = html.indexOf('</title>');
 
-            const cssLinkTag = `\n<link rel="stylesheet" href="${value}.css" />`;
+            const resolvedValue = value.endsWith(".css") ? value : `${value}.css`
+            const cssLinkTag = `\n<link rel="stylesheet" href="${resolvedValue}" />`;
 
             if (titleTagIndex !== -1) {
                 const insertPosition = titleTagIndex + '</title>'.length;
@@ -477,7 +479,8 @@ export default class Parser {
 
                             if (this.currentToken?.type == TOKEN_TYPES.STRING && REGEX_PATH_STRING.test(this.currentToken?.value)) {
 
-                                const content: string = fs.readFileSync(path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")), "utf-8");
+                                const componentPath = path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, ""));
+                                const content: string = fs.readFileSync(componentPath.endsWith(".zare") ? componentPath : `${componentPath}.zare`, "utf-8");
 
                                 const tokenizer: Lexer = new Lexer(content, path.resolve(this.__view, this.currentToken?.value.replace(`"`, "").replace(`"`, "")));
                                 const componentTokens: Token[] = tokenizer.start();

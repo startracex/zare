@@ -115,13 +115,14 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `link css "/dummy"
+            const testCode = `link css "/dummy.css"
             serve (
             ${testHtml}
             )`
 
             const parser = setParser(testCode)
             const html = parser.linkStatic(testHtml);
+
             expect(html).includes(`<link rel="stylesheet" href="/dummy.css" />`)
         })
 
@@ -156,7 +157,7 @@ describe('Parser', () => {
 
             const parser = setParser(testCode)
             const html = parser.linkStatic(testHtml);
-            
+
             expect(html).includes(`<link rel="stylesheet" href="/dummy.css" />`)
         })
 
@@ -174,7 +175,7 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `import js "/dummy"
+            const testCode = `import js "/dummy.js"
             serve (
             ${testHtml}
             )`
@@ -215,7 +216,7 @@ describe('Parser', () => {
 
             const parser = setParser(testCode)
             const html = parser.linkStatic(testHtml);
-            
+
             expect(html).includes(`<script src="/dummy.js" defer/></script>`)
         })
     });
@@ -294,7 +295,7 @@ describe('Parser', () => {
     describe("components", () => {
 
         it("should import component", () => {
-            const testCode = `as Dummy import "./tests/dummy_views/dummy.zare"`;
+            const testCode = `as Dummy import "./tests/dummy_views/dummy"`;
             const html = render(testCode);
 
             expect(html).toBeFalsy();
@@ -302,7 +303,7 @@ describe('Parser', () => {
 
         it("should throw unended component error", () => {
             const testCode = `
-            as Dummy import "./tests/dummy_views/dummy.zare"
+            as Dummy import "./tests/dummy_views/dummy"
             serve (<Dummy>)`;
 
             try {
@@ -316,7 +317,7 @@ describe('Parser', () => {
 
             it("should display self closing component", () => {
                 const testCode = `
-                as Dummy import "./tests/dummy_views/dummy.zare"
+                as Dummy import "./tests/dummy_views/dummy"
                 serve (<Dummy/>)`;
 
                 const html = render(testCode);
@@ -325,7 +326,7 @@ describe('Parser', () => {
 
             it("should display attributes in self closing component", () => {
                 const testCode = `
-                as Dummy import "./tests/dummy_views/dummy_attr.zare"
+                as Dummy import "./tests/dummy_views/dummy_attr"
                 serve (<Dummy name="fake_name"/>)`;
 
                 const html = render(testCode);
@@ -355,7 +356,7 @@ describe('Parser', () => {
 
             it("should display slot in component", () => {
                 const testCode = `
-                as Dummy import "./tests/dummy_views/dummy_slot.zare"
+                as Dummy import "./tests/dummy_views/dummy_slot"
                 serve (<Dummy>fake_slot</Dummy>)`;
 
                 const html = render(testCode);
@@ -427,7 +428,7 @@ describe('Parser', () => {
             const html = render(testCode, { user: "fake_user" });
             expect(html.trim()).toBe("fake_user");
         });
-        
+
         it("should display Hello World in if block", () => {
             const testCode = `
             fn toggle (value) {
