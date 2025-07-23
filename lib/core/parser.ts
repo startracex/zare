@@ -18,7 +18,7 @@ const REGEX_PARAMETER_EXPRESSION = /[a-zA-Z0-9]+/g;
 const REGEX_FN_CALL_EXTRACT = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
 const REGEX_COMPONENT_ATTR = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
 const REGEX_OPENING_TAG = /^<([a-zA-Z0-9_-]+)([^>]*)\/?>/;
-const REGEX_CLOSING_TAG = /^<\/([a-zA-Z0-9]+)>/;
+const REGEX_CLOSING_TAG = /^<\/([a-zA-Z0-9_-]+)>/;
 const REGEX_SELF_CLOSING_TAG = /^<([^\s>\/]+)/;
 const REGEX_STYLE_TAG = /^<style.*>$/;
 const REGEX_SCRIPT_TAG = /^<script.*>$/;
