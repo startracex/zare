@@ -365,6 +365,15 @@ describe('Parser', () => {
     });
 
     describe("tags", () => {
+        describe("custom element tag", () => {
+
+            it("should handle style tag", () => {
+                const testCode = `serve (<my-element></my-element>)`;
+                const html = render(testCode);
+                expect(html).toBe(`<my-element></my-element>`);
+            });
+        });
+
         describe("style tag", () => {
 
             it("should handle style tag", () => {
