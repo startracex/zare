@@ -154,6 +154,10 @@ export default class Lexer {
         let parentCount: number = -1;
         this.advance();
         while (this.currentCharacter && parentCount != 0) {
+            if (parentCount == -1 && WHITESPACE_REGEX.test(this.currentCharacter)) {
+                throw Template_Error.toString("Unexpected whitespace", { cause: "Unexpected whitespace", code: "Template Error", lineNumber: this.line, columnNumber: this.column, filePath: this.filePath })
+            }
+
             if (this.currentCharacter == '(') {
                 if (parentCount == -1) parentCount = 1;
                 else parentCount++;
