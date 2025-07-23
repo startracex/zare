@@ -115,7 +115,7 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `link css "/dummy.css"
+            const testCode = `link "/dummy.css"
             serve (
             ${testHtml}
             )`
@@ -127,7 +127,7 @@ describe('Parser', () => {
         })
 
         it("should throw head tag not found error for linking css", () => {
-            const testCode = `link css "/dummy"`
+            const testCode = `link "/dummy"`
 
             try {
                 const parser = setParser(testCode)
@@ -150,7 +150,7 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `link css "/dummy"
+            const testCode = `link "/dummy"
             serve (
             ${testHtml}
             )`
@@ -175,7 +175,7 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `import js "/dummy.js"
+            const testCode = `import "/dummy.js"
             serve (
             ${testHtml}
             )`
@@ -186,7 +186,7 @@ describe('Parser', () => {
         });
 
         it("should throw head tag not found error for importing js", () => {
-            const testCode = `import js "/dummy"`
+            const testCode = `import "/dummy"`
 
             try {
                 const parser = setParser(testCode)
@@ -209,7 +209,7 @@ describe('Parser', () => {
             </body>
             </html>`;
 
-            const testCode = `import js "/dummy"
+            const testCode = `import "/dummy"
             serve (
             ${testHtml}
             )`
