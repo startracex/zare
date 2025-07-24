@@ -9,6 +9,7 @@
     "dev": "turbo run dev",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
+    "licenses": "node scripts/copy-licenses.js",
     "prepare": "husky",
     "changeset": "changeset"
   },
