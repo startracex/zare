@@ -1,20 +1,23 @@
+import { resolve } from "path";
 import Lexer from "../lib/core/lexer";
 import Parser from "../lib/core/parser";
 import { describe, it, expect, beforeEach } from "vitest";
 
+const root = resolve(import.meta.filename, "../..");
+
 const render = (testCode: string, dummyParams = {}): string => {
     const tokens = new Lexer(testCode, "").start();
-    const parser = new Parser(tokens, dummyParams, '');
+    const parser = new Parser(tokens, dummyParams, root);
     const parsed = parser.parse();
     return parser.parameterExecuter(parsed);
-}
+};
 
 const setParser = (testCode: string, dummyParams: Record<string, any> = {}) => {
     const tokens = new Lexer(testCode, "").start();
-    const parser = new Parser(tokens, dummyParams, '');
+    const parser = new Parser(tokens, dummyParams, root);
     parser.parse();
-    return parser
-}
+    return parser;
+};
 
 describe('Parser', () => {
     let parser: Parser;

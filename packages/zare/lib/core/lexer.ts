@@ -1,6 +1,6 @@
 import { TOKEN_TYPES } from "../constants/tokenTypes.js";
 import { KEYWORDS } from "../constants/keywords.js";
-import { Token } from "../types/token.js";
+import type { Token } from "../types/token.js";
 import Template_Error from "../errors/templateError.js";
 
 const WHITESPACE_REGEX: RegExp = /[\t\n\r\f\v ]/;

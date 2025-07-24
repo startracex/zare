@@ -3,7 +3,7 @@ import Stack from "../utils/stack.js";
 import Scope from "../utils/scope.js";
 import { TOKEN_TYPES } from "../constants/tokenTypes.js";
 import { KEYWORDS } from "../constants/keywords.js";
-import { Token } from "../types/token.js";
+import type { Token } from "../types/token.js";
 import modules from "../modules/index.js";
 import fs from "fs";
 import path from "path";
