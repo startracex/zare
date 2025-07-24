@@ -1,39 +1,30 @@
 {
-  "name": "zare",
-  "version": "2.5.1",
+  "name": "zare-repo",
+  "version": "0.0.0",
+  "private": true,
   "description": "A file base component template engine",
-  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "node dist/index.js",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
+    "licenses": "node scripts/copy-licenses.js",
     "prepare": "husky",
     "changeset": "changeset"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "@commitlint/config-conventional": "^19.8.1",
+    "@manypkg/get-packages": "^3.0.0",
     "@types/node": "^24.1.0",
     "@vitest/coverage-v8": "^3.1.4",
     "commitlint": "^19.8.1",
     "husky": "^9.1.7",
     "vitest": "^3.1.4"
   },
-  "files": [
-    "lib",
-    "dist",
-    "CHANGELOG.md"
+  "workspaces": [
+    "packages/*"
   ],
-  "author": "@IsmailBinMujeeb (ismailbinmujeeb@gmail.com)",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IsmailBinMujeeb/zare.git"
-  },
-  "bugs": {
-    "url": "https://github.com/IsmailBinMujeeb/zare/issues"
-  },
-  "homepage": "https://zare-js.hashnode.space/"
+  "packageManager": "npm@11.4.2"
 }
