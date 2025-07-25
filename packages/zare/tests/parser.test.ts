@@ -73,6 +73,21 @@ describe('Parser', () => {
             expect(render(testCode).trim()).toBe("HELLO");
         });
 
+        it("should evaluate function call with function call as argument", () => {
+
+            const testCode = `use math
+
+            fn sum(a, b) {
+                return Number(a) + Number(b)
+            }
+            serve (
+                @pow(sum(2, 3), 2)
+            )
+            `;
+
+            expect(render(testCode, {}).trim()).toBe("25");
+        });
+
         it("should evaluate function call with parameter", () => {
 
             const testCode = `use string

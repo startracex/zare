@@ -29,6 +29,7 @@ const REGEX_PATH_STRING = /"(\.?\.?(\/[\w.\- ]+)*\/?|\.{1,2})"/;
 const REGEX_CSS_PATH = /^"(\.?\/.*)"$/;
 const REGEX_JS_PATH = /^"(\.?\/.*)"$/;
 const REGEX_FN_PARAMS = /^[a-zA-Z0-9.]+$/;
+const REGEX_FN_CALLS_IN_FN_ARGS = /\b([a-zA-Z_]\w*)\s*\(\s*([^()]*?)\s*\)/;
 const REGEX_EACH_EXPRESSION = /\((.*?)\)/;
 
 export default class Parser {
@@ -279,6 +280,12 @@ export default class Parser {
                 if (Number(trimmed)) fnArgs.push(trimmed);
                 else if (REGEX_FN_PARAMS.test(trimmed))
                     fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+                else if (REGEX_FN_CALLS_IN_FN_ARGS.test(trimmed)) {
+                    const functionProperties = this.extractFunctionCallValues(`@${trimmed}`);
+                    const fn = this.functions.lookup(functionProperties === null || functionProperties === void 0 ? void 0 : functionProperties.fnName);
+                    const fnReturnValue = fn(...(functionProperties === null || functionProperties === void 0 ? void 0 : functionProperties.fnArgs) || []);
+                    fnArgs.push(fnReturnValue);
+                }
                 else if ((trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) && (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))) fnArgs.push(trimmed.slice(1, -1))
                 else
                     fnArgs.push(trimmed);
