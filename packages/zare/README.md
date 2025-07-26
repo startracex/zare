@@ -33,19 +33,19 @@ To start using the project, follow these steps:
 2. Express Setup with Zare
 
    ```js
-   "/app.js";
-   import express from "express";
+   '/app.js';
+   import express from 'express';
 
    const app = express();
    const port = 3000;
 
-   app.set("view engine", "zare");
+   app.set('view engine', 'zare');
 
-   app.get("/", (req, res) => {
-     res.render("index", { text: "World" });
+   app.get('/', (req, res) => {
+     res.render('index', { text: 'World' });
    });
 
-   app.listen(port, () => console.log("Running at http://localhost:3000"));
+   app.listen(port, () => console.log('Running at http://localhost:3000'));
    ```
 
 3. Create a index.zare file in views folder and paste

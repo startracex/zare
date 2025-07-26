@@ -1,28 +1,27 @@
-import type { Token } from "../types/token.js";
+import type { Token } from '../types/token.js';
 
 export default class Stack {
+  constructor(
+    private stack: Token[] = [],
+    private top: number = -1,
+  ) {}
 
-    constructor(private stack: Token[] = [], private top: number = -1) { }
+  push(element: any): void {
+    this.stack.push(element);
+    this.top++;
+  }
 
-    push(element: any): void {
+  pop(): Token | undefined {
+    const element: Token | undefined = this.stack.pop();
+    this.top--;
+    return element;
+  }
 
-        this.stack.push(element);
-        this.top++;
-    }
+  size(): number {
+    return this.top + 1;
+  }
 
-    pop(): Token | undefined {
-
-        const element: Token | undefined = this.stack.pop();
-        this.top--;
-        return element
-    }
-
-    size(): number {
-
-        return this.top + 1;
-    }
-
-    isEmpty(): boolean {
-        return this.top == -1 ? true : false;
-    }
+  isEmpty(): boolean {
+    return this.top == -1 ? true : false;
+  }
 }
