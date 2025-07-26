@@ -11,7 +11,9 @@
     "coverage": "vitest run --coverage",
     "licenses": "node scripts/copy-licenses.js",
     "prepare": "husky",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "format": "dprint fmt",
+    "fmt:check": "dprint check"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
