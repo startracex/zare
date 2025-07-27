@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Zare',
   tagline: 'Effortless, Dynamic Templating',
-  favicon: 'img/favicon.ico',
+  favicon: 'https://github.com/IsmailBinMujeeb/zare/blob/main/assets/icon.png?raw=true',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -73,17 +73,18 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'Zare',
+      title: 'Zare⚡',
       logo: {
         alt: 'Zare Logo',
-        src: 'img/logo.svg',
+        src: 'https://github.com/IsmailBinMujeeb/zare/blob/main/assets/b-icon.png?raw=true',
+        srcDark: 'https://github.com/IsmailBinMujeeb/zare/blob/main/assets/w-icon.png?raw=true'
       },
       items: [
         {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
