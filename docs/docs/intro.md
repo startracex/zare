@@ -1,47 +1,48 @@
 ---
+title: Intro
+slug: intro
 sidebar_position: 1
 ---
+## Installation
 
-# Tutorial Intro
+1. NPM
 
-Let's discover **Docusaurus in less than 5 minutes**.
+   ```bash
+   npm i zare
+   ```
 
-## Getting Started
+2. YARN
 
-Get started by **creating a new site**.
+   ```bash
+   yarn add zare
+   ```
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Express Setup
 
-### What you'll need
+```javascript
+import express from "express"; // Make sure you have express downloaded from npm  or yarn
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+const app = express();
+const PORT = 3000; // Our server will be running at port 3000
 
-## Generate a new site
+app.set("view engine", "zare"); // zare package must be install.
 
-Generate a new Docusaurus site using the **classic template**.
+app.get("/", (req, res) => {
+    res.render("index")
+});
 
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
+app.listen(PORT);
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+## Writing your first Zare file
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+create a file in views folder and name it index.zare.
 
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
+```zare
+# view/index.zare
+serve (
+    <h1>Hello, Zare</h1>
+)
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+💌: Since `v2` we have made big changes in the core engine and continuously new releases are coming, for future **Zare developers** we suggest to use as latest version as you can use.

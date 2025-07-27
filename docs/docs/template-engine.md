@@ -1,0 +1,172 @@
+---
+title: Template Engine
+slug: template-engine
+sidebar_position: 2
+---
+A **template engine** is a tool that helps generate dynamic content by merging templates (HTML, XML, or other text-based formats) with data. It separates the static structure of the content (the template) from the dynamic data (like user input, database results, or application data).
+
+Here's how it works:
+
+1. **Template**: It's like a "skeleton" or blueprint for the content, often including placeholders or special syntax.
+
+2. **Data**: This is the dynamic content (such as user names, post content, etc.) that gets filled into the template.
+
+3. **Rendering**: The template engine processes the template by replacing placeholders with actual data, generating the final output (like HTML or emails).
+
+For example, in a web application, you might have a template like:
+
+```zare
+serve (
+    <h1>Hello, @(name)!</h1>
+    <p>Your last login was on @(lastLoginDate).</p>
+)
+```
+
+When the engine processes this, it would replace `@(name)` and `@(lastLoginDate)` with actual data, resulting in something like:
+
+```html
+<h1>Hello, John!</h1>
+<p>Your last login was on April 26, 2025.</p>
+```
+
+Popular template engines:
+
+* **Zare**
+
+* **EJS**
+
+* **Jinja2** (for Python)
+
+* **Handlebars.js**
+
+* **Pug** (formerly Jade)
+
+These engines simplify the process of rendering dynamic content, especially in web development.
+
+## How To Use Template Engine
+
+### 1. **Install the Template Engine**
+
+In this complete guide we will use `express` to render our Zare Templates on web page, you would first install the `Zare` template engine via `npm`.
+
+For example, for **ZARE**:
+
+```bash
+npm i zare
+```
+
+Or using **Yarn**:
+
+```bash
+yarn add zare
+```
+
+### 2. **Set Up the Template Engine in Your Application**
+
+After installation, you need to set up the engine in your server application.
+
+#### Example with **ZARE** in **Express.js**:
+
+First, install **Express**:
+
+```bash
+npm install express
+```
+
+Then, set up Zare:
+
+```javascript
+const express = require('express');
+const app = express();
+
+// Set the view engine to Zare
+app.set('view engine', 'zare');
+
+// Define a route
+app.get('/', (req, res) => {
+  const data = { name: 'John', age: 25 };
+  res.render('index', data); // Render the template 'index.zare' with 'data'
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
+```
+
+Here, `res.render('index', data)` renders the `index.zare` template and passes the `data` object.
+
+### 3. **Create the Template Files**
+
+Your template files will typically reside in a `views` folder. For example, in the above code, you'd have an `index.zare` file in the `views` folder with the following content:
+
+**index.zare**:
+
+```zare
+serve (
+    <h1>Hello, @(name)!</h1>
+    <p>You are @(age) years old.</p>
+)
+```
+
+* `@( )` is the Zare syntax to insert values from the `data` object.
+
+* When the server renders this template, it will replace `@(name)` with `John` and `@(age)` with `25`.
+
+### 4. **Render Data Dynamically**
+
+In the route or controller, you can pass dynamic data to the template.
+
+For example, if you wanted to dynamically display a list of items:
+
+**index.zare**:
+
+```zare
+serve (
+    <h1>Items List</h1>
+    <ul>
+      @each (items:item) {
+        <li>@(item)</li>
+    }
+    </ul>
+)
+```
+
+**Server-side (Express.js)**:
+
+```javascript
+const items = ['Apple', 'Banana', 'Cherry'];
+res.render('index', { items });
+```
+
+This will render the following HTML:
+
+```xml
+<h1>Items List</h1>
+<ul>
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Cherry</li>
+</ul>
+```
+
+### 5. **Run the Application**
+
+Once everything is set up, run your application, and the template engine will render dynamic content based on the template and data provided.
+
+```bash
+node app.js
+```
+
+### Common Template Engine Syntax
+
+* **EJS**: `<%= variable %>` for output, `<% %>` for logic.
+
+* **Pug**: Uses indentation for nested structures, like:
+
+  ```pug
+  h1 Hello, #{name}!
+  p You are #{age} years old.
+  ```
+
+  This would be the equivalent of the Zare example above.

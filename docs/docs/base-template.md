@@ -1,0 +1,62 @@
+---
+title: Base Template
+slug: base-template
+sidebar_position: 7
+---
+The Base Templates are normal components you just wrap your page code in this Base Component.
+
+The Base Template/Component is same as normal component importing and usage is also same but the idea is to not write basic html boilerplate code like doctype and meta tags multiple times for the same project.
+
+The only thing that changes in the Boilerplate code of HTML is `Title` content of your page or maybe the meta tags description to make it dynamic you can use Component Parameters.
+
+Here is a complete example code of a Base Template that have a dynamic title for each page.
+
+```zare
+# /views/base.zare
+
+serve (
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8"/>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+          <title>@(title)</title>
+        </head>
+        <body>
+            @(slot)
+        </body>
+        </html>
+) 
+```
+
+### Notes
+
+* You can’t use Doctype tag in `v1` it will throw error we will handle it in `v2`.
+
+* You can’t use `style` and `script` tag in any Zare file it is not supported yet but you can use `linking css` and `importing vanilla js` statements which is explained here.
+
+* `@(slot)` parameter is necessary without it your code will not shown.
+
+Now the Page code that will use the above template.
+
+```zare
+# /views/pages/index.zare
+as Base import "../base"
+
+serve (
+    <Base title="Landing Page">
+        <!-- Your Whole Page content will goes here -->
+    </Base>
+)
+```
+
+### Note
+
+* The `@(title)` in `/views/base.zare` will be replaces with `Landing Page`.
+
+* The `@(slot)` in `/views/pages/index.zare` will be replaces with your page content.
+
+## Imagine
+
+You can easily imagine the structure of how your code will be look like after using Base templates and Components in your main page file.
+
+![base-template-example](https://cdn.hashnode.com/res/hashnode/image/upload/v1745816338607/7d0594cf-1213-4439-af57-1eafc76d3ed3.png)

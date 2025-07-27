@@ -1,0 +1,44 @@
+---
+title: String Modules
+slug: string-modules
+sidebar_position: 2
+---
+
+The Zare provides some basic functions to perform some operations on strings.
+
+## Import String Module
+
+```zare
+use string
+```
+
+## Example
+
+```zare
+use string
+
+serve (
+    <h1>@upper(username)</h1>
+    <h1>@trim(bio)</h1>
+)
+```
+
+## Methods
+
+| Method | Arguments | Description |
+|--------|-----------|-------------|
+| `@length()` | string | return the length of string 
+| `@upper()` | string | convert to upper case 
+| `@lower()` | string | convert to lower case 
+| `@at()` | string, index | return the character at index 
+| `@codeAt()` | string , index | return the character code at index
+| `@slice()` | string , start (Index) , end (Index) | slice from start to end index
+| `@subString()` | string, start (Index), end (Index) | return the sub string from start to end
+| `@concat()` | string, string | concatenates two strings
+| `@trim()` | string | trims the string
+| `@trimStart()` | string | trims the string from start
+| `@trimEnd()` | string | trims the string from end
+| `@repeat()` | string, count | repeat a string count times
+| `@replace()` | string, substring1, substring2 | replace a sub string 1 from string with sub string 2
+| `@replaceAll()` | string, substring1, substring2 | replace all substring 1 from string with substring 2 
+| `@split()` | string, sub string | split a string bases on the second argument sub string 
