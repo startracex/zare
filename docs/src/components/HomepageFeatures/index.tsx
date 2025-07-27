@@ -11,35 +11,33 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Handles Static Files',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Zare's initial motive is to give easy syntax to handle static files, Here we provides best and easiest syntax to handle the static files.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Write JavaScript Functions',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Zare provides you power to write JavaScript functions in the same file, Makes it easy to utility functions
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'It\'s Too Easy To Display',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Display data in the modern and easy way, Zare gives you <code>@(...)</code> syntax for easy and fast development.
       </>
     ),
   },
+  
 ];
 
 function Feature({title, Svg, description}: FeatureItem) {
