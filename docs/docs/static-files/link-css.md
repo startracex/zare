@@ -1,0 +1,106 @@
+---
+title: Link CSS
+label: Link CSS
+slug: link-css
+sidebar_position: 2
+---
+
+## Overview
+
+The CSS files are static files that might not be in the same folder as your template files. To access these CSS or any static files, you need to configure your server based on your framework or library. We cover this for Express.js [here](static-files).
+
+## Syntax
+
+```zare
+link "/path/to/navbar.css"
+```
+- The first keyword is `link` which is predefined in Zare for linking your css file.
+
+- And path, the path is by default start from your static folder
+
+**Node**: Before v2.5.0 you have to manually specify unique css name (e.g. `navbarcss`, `footercss`)
+
+## Handle Path
+
+If you are a beginner then it is must important to understand the folder structure of your project.
+
+here we consider that you are using `express` for your server-side and `public` folder as your static folder and `views` folder as your template folder.
+
+So the path must looks like `/navbar.css` if your css in the root of public folder.
+
+## Errors
+
+If your not using `head` tag in your file or in your Base Template you can’t link the `Css` or any static files because the Zare’s parser try to find the `head` tag in your file code to add `link` in it, and if the parser failed to find any `head` tag it will throw you an error.
+
+## Example
+
+Here is a minimal example of how you can link css with Base templates
+
+
+```zare
+# /views/pages/index.zare
+as Base import "../base"
+link "/css/index" # will be ./public/css/index.css
+
+serve (
+    <Base title="Button">
+        <button>Get Started</button>
+    </Base>
+)
+```
+
+And as mention above your template must have a head tag.
+
+
+```zare
+# /views/base.zare
+
+serve (
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8"/>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+          <title>@(title)</title>
+        </head>
+        <body>
+            @(slot)
+        </body>
+        </html>
+)
+```
+
+So that the final HTML output will be something
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Button</title>
+        <link rel="stylesheet" href="/style/index.css">
+    </head>
+    <body>
+        <button>Get Started</button>
+    </body>
+</html>
+
+```
+
+In v1 Doctype will not support.
+
+## Link In Component Files
+
+It is also possible to link css in your component files directly so that when ever you import your component the css will be linked with it.
+
+```zare
+# /views/component/footer
+link "/css/footer"
+
+serve (
+    <footer>This is a Footer</footer>
+)
+```
+
+Now when ever you import this footer component in your pages the footer css will be linked automatically in your head tag.
