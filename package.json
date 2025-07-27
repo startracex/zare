@@ -8,6 +8,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "test": "vitest run",
+    "docs:start": "cd docs && npm start",
+    "docs:build": "cd docs && npm run build",
     "coverage": "vitest run --coverage",
     "licenses": "node scripts/copy-licenses.js",
     "prepare": "husky",
@@ -27,7 +29,8 @@
     "vitest": "^3.1.4"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "docs"
   ],
   "packageManager": "npm@11.4.2"
 }
