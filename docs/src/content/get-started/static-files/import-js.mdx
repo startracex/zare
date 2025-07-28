@@ -1,0 +1,32 @@
+---
+title: Import JS
+---
+
+## Overview
+
+The importing js in **Zare** is refer to adding a script tag in your header with `src` and `defer`. The importing js is same as linking the css just a keyword changed.
+
+## Syntax
+
+```zare
+import "/js/nav" # You can specify the .js extension it will not throw error
+```
+
+- The `import` keyword tells the `parser` that a vanilla js is imported and its path is `“/js/nav“`.
+
+- The `“/js/nav“` which is the path to your vanilla js, kindly refer [this](static-files) to understand static files.
+
+## Import in Component Files
+
+It is also possible to import js in your component files directly so that when ever you import your component the vanilla js will be imported with it.
+
+```zare fulename="/views/component/footer"
+import "/js/footer"
+
+serve (
+    <footer>This is a Footer</footer>
+)
+```
+
+Now when ever you import this footer component in your pages the footer js will imported automatically in your head tag.
+

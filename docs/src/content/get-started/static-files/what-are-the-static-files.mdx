@@ -1,0 +1,93 @@
+---
+title: What Are The Static Files
+---
+## Overview
+
+**Static files** are files that do not change dynamically when a web server runs.\
+They are delivered to the client exactly as they are stored, without any server-side processing.
+
+Common types of static files include:
+
+* HTML files
+
+* CSS files
+
+* JavaScript files
+
+* Images (JPG, PNG, SVG, etc.)
+
+* Fonts (TTF, WOFF, etc.)
+
+* Videos and other media files
+
+## Purpose
+
+Static files are essential for:
+
+* Structuring the webpage (HTML)
+
+* Styling the webpage (CSS)
+
+* Adding client-side interactivity (JavaScript)
+
+* Displaying media (images, videos, fonts)
+
+They improve performance by reducing server processing and are often cached by browsers for faster loading.
+
+## Usage
+
+### In Web Servers
+
+Most web frameworks and servers provide mechanisms to serve static files.\
+You typically configure a directory (folder) where static assets are stored and make it accessible to the public.
+
+Example (generic):
+
+```plaintext
+/static
+    ├── index.html
+    ├── styles/
+    │   └── style.css
+    ├── scripts/
+    │   └── app.js
+    └── images/
+        └── logo.png
+```
+
+### Important Points
+
+* Static files are served *as-is*, with no changes at runtime.
+
+* Efficient caching strategies can be applied to static files.
+
+* They are usually placed in a separate directory like `static/`, `public/`, or `assets/`.
+
+## Example (Node.js with Express)
+
+```javascript filename="index.js"
+const express = require('express');
+const app = express();
+
+// Serve static files from the "public" folder
+app.use(express.static('public'));
+
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+});
+```
+
+In this case, files inside the `public/` folder can be accessed directly from the browser.
+
+## Best Practices
+
+* **Organize** static files into subfolders (e.g., CSS, JS, images).
+
+* **Compress** files (e.g., minify CSS and JS) for faster load times.
+
+* **Use caching** headers to allow browsers to store static files.
+
+* **Secure** the static file serving to prevent access to sensitive files.
+
+## Conclusion
+
+Static files are a fundamental part of web development, providing the building blocks for creating responsive and visually appealing websites. Proper management of static files leads to improved performance and a better user experience.
