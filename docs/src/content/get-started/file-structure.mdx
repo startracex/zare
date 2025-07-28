@@ -1,0 +1,73 @@
+# Structure Of Zare Files
+
+The structure of any zare file is divided into two parts.
+
+1. Partials
+
+   * It includes importing the components, statics files etc
+
+2. serve
+
+   * It serves the HTML logic that will be converted to HTML
+
+## Partials
+
+In the section you can import your components and static files like `CSS` and `vanilla JavaScript`.
+
+### Example
+
+```zare filename="index.zare"
+as Card import "./components/Card" # Component importing
+link PageCss "/stylesheets/style.css" # Link's css
+import PageJs "/javascripts/main.js" # Import's Vanilla Js
+```
+
+The partial section only provides this keywords:
+
+* `as` To declare a component
+
+* `import` Has two use case, to import component and to add script tag in your final `HTML`
+
+* `link` is used to add link tag in your final `HTML`
+
+## Serve
+
+The serve section is the main executor for your code. It contains the HTML plus Logic eg, If, Else, Function calls and Each loop.
+
+### Example
+
+```zare filename="index.zare"
+serve (
+    @if (1 == 1) {
+        <h1>The 1 is equal to 1</h1>
+    } @else {
+        <h1>1 is not equal to 1</h1>
+    }
+)
+```
+
+The above code is an example of if else statements in zare templating, Also thing to mark is that the keywords used in serve block must start with `@`.
+
+* `@if`
+
+* `@else`
+
+* `@each`
+
+## Conclusion
+
+After describing the both sections the final structure on a single file will look like
+
+```zare filename="index.zare"
+as Card import "./components/Card" # Component importing
+link PageCss "/stylesheets/style.css" # Link's css
+import PageJs "/javascripts/main.js" # Import's Vanilla Js
+
+serve (
+    @if (1 == 1) {
+        <h1>The 1 is equal to 1</h1>
+    } @else {
+        <h1>1 is not equal to 1</h1>
+    }
+)
+```
