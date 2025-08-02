@@ -1,0 +1,66 @@
+# Quick Start
+
+> Start using Zare CLI to build Zare websites without setting up the backend server
+
+## Installation
+
+### Global Installation
+
+````bash
+npm i -g @zarejs/cli
+````
+
+### DevDependency Installation
+
+````bash
+npm i --save-dev @zarejs/cli
+````
+
+## About Zare CLI
+
+`@zarejs/cli` is an official, open source command line interface for creating, building and serving the Zare template engine code without setting up a backend server.
+
+## Prerequisites
+
+1. Install Node.js on your machine, for more information visit https://nodejs.org/
+2. NPM or any package manager (e.g. `yarn`, `pnpm`) should be installed
+
+## Useful Commands
+
+### Creating A New Project
+
+#### Using `npx`
+````bash
+npx zare init myapp
+````
+
+#### Using `zare`
+
+> If you have installed `@zarejs/cli` globally.
+
+````bash
+zare init myapp
+````
+
+Hit enter and it will create a new directory where required files and folders were setup
+
+### Start Serving
+
+````bash
+npx zare serve myapp
+````
+
+This start a local `express` server, `myapp` is should be a valid project directory path which contains `pages` folder and `zare config file`.
+
+### Build `HTML`
+
+````bash
+npx zare build myapp
+````
+
+This will build the static `html` files from your zare `files`.
+
+## Further Reading
+
+- [Folder Structure](folder-structure.mdx)
+- [Configurations](configuration.mdx)
