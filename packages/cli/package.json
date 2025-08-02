@@ -1,7 +1,6 @@
 {
   "name": "@zare/cli",
   "version": "1.0.0",
-  "private": true,
   "bin": {
     "zare": "./dist/index.js"
   },
