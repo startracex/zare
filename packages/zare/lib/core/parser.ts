@@ -171,7 +171,11 @@ export default class Parser {
    * of `@(...)` with corresponding parameter values obtained from `this.parameters`. If
    * `isInRavenFormate` is false, it directly retrieves the parameter value for the entire `
    */
-  parameterExecuter(html: string, isInRavenFormate: boolean = true, parameters: Record<string, any> | undefined = undefined) {
+  parameterExecuter(
+    html: string,
+    isInRavenFormate: boolean = true,
+    parameters: Record<string, any> | undefined = undefined,
+  ) {
     const params = parameters || this.parameters;
 
     if (isInRavenFormate) {
@@ -241,7 +245,11 @@ export default class Parser {
     );
     const parsed: string = parser.htmlParser('');
     for (let i = 0; i < arr.length; i++) {
-      html += parser.parameterExecuter(parsed, true, { ...this.parameters, [key]: arr[i], _i: i });
+      html += parser.parameterExecuter(parsed, true, {
+        ...this.parameters,
+        [key]: arr[i],
+        _i: i,
+      });
     }
 
     return html;
@@ -359,8 +367,7 @@ export default class Parser {
             : functionProperties.fnArgs) || []),
         );
         fnArgs.push(fnReturnValue);
-      }
-      else if (
+      } else if (
         (trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) &&
         (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))
       )
@@ -597,12 +604,15 @@ export default class Parser {
                 this.currentToken?.type == TOKEN_TYPES.STRING &&
                 REGEX_PATH_STRING.test(this.currentToken?.value)
               ) {
-
-                const componentString = this.currentToken?.value.replace(`"`, '').replace(`"`, '');
-                const componentDir = componentString.startsWith(":") ? findNodeModules() || "" : this.__view;
+                const componentString = this.currentToken?.value
+                  .replace(`"`, '')
+                  .replace(`"`, '');
+                const componentDir = componentString.startsWith(':')
+                  ? findNodeModules() || ''
+                  : this.__view;
                 const componentPath = path.resolve(
                   componentDir,
-                  componentString.replace(":", ""),
+                  componentString.replace(':', ''),
                 );
                 const content: string = fs.readFileSync(
                   componentPath.endsWith('.zare')
@@ -613,10 +623,7 @@ export default class Parser {
 
                 const tokenizer: Lexer = new Lexer(
                   content,
-                  path.resolve(
-                    path.dirname(componentPath),
-                    componentPath,
-                  ),
+                  path.resolve(path.dirname(componentPath), componentPath),
                 );
                 const componentTokens: Token[] = tokenizer.start();
 
@@ -983,7 +990,7 @@ export default class Parser {
         while (
           this.currentToken &&
           this.currentToken.value.match(REGEX_CLOSING_TAG)?.[1].trim() !==
-          componentName
+            componentName
         ) {
           slotTokens.push(this.currentToken);
           this.eat();

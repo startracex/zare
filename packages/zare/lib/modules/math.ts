@@ -42,12 +42,32 @@ export default [
     fnParams: ['num'],
     fnBody: `return Math.sqrt(parseInt(num))`,
   },
-  { fnName: 'abs', fnParams: ['num'], fnBody: `return Math.abs(parseInt(num))` },
-  { fnName: 'sin', fnParams: ['num'], fnBody: `return Math.sin(parseInt(num))` },
-  { fnName: 'cos', fnParams: ['num'], fnBody: `return Math.cos(parseInt(num))` },
-  { fnName: 'tan', fnParams: ['num'], fnBody: `return Math.tan(parseInt(num))` },
+  {
+    fnName: 'abs',
+    fnParams: ['num'],
+    fnBody: `return Math.abs(parseInt(num))`,
+  },
+  {
+    fnName: 'sin',
+    fnParams: ['num'],
+    fnBody: `return Math.sin(parseInt(num))`,
+  },
+  {
+    fnName: 'cos',
+    fnParams: ['num'],
+    fnBody: `return Math.cos(parseInt(num))`,
+  },
+  {
+    fnName: 'tan',
+    fnParams: ['num'],
+    fnBody: `return Math.tan(parseInt(num))`,
+  },
   { fnName: 'random', fnParams: [], fnBody: `return Math.random()` },
-  { fnName: 'log', fnParams: ['num'], fnBody: `return Math.log(parseInt(num))` },
+  {
+    fnName: 'log',
+    fnParams: ['num'],
+    fnBody: `return Math.log(parseInt(num))`,
+  },
   {
     fnName: 'log2',
     fnParams: ['num'],

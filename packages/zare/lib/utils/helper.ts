@@ -1,5 +1,5 @@
-import path from "path"
-import fs from "fs"
+import path from 'path';
+import fs from 'fs';
 
 export function escapeHTML(str: string): string {
   return str.replace(/[&<>"']/g, char => {
@@ -31,8 +31,8 @@ export function sanitizeOptions(
     } else if (typeof options[key] === 'object' && options[key] !== null) {
       sanitized[key] = Array.isArray(options[key])
         ? options[key].map(item =>
-          typeof item === 'string' ? escapeHTML(item) : item,
-        )
+            typeof item === 'string' ? escapeHTML(item) : item,
+          )
         : sanitizeOptions(options[key]);
     } else {
       sanitized[key] = options[key];

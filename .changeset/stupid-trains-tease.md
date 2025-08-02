@@ -1,5 +1,5 @@
 ---
-"zare": minor
+'zare': minor
 ---
 
 third party components support
