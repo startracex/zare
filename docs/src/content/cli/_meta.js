@@ -1,3 +1,4 @@
 export default {
-  'soon': '',
+  'quick-start': '',
+  'folder-structure': '',
 }
