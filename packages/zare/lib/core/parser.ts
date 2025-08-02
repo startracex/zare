@@ -344,6 +344,22 @@ export default class Parser {
       if (Number(trimmed)) fnArgs.push(trimmed);
       else if (REGEX_FN_PARAMS.test(trimmed))
         fnArgs.push(this.getValue(this.parameters, trimmed) || '');
+      else if (REGEX_FN_CALLS_IN_FN_ARGS.test(trimmed)) {
+        const functionProperties = this.extractFunctionCallValues(
+          `@${trimmed}`,
+        );
+        const fn = this.functions.lookup(
+          functionProperties === null || functionProperties === void 0
+            ? void 0
+            : functionProperties.fnName,
+        );
+        const fnReturnValue = fn(
+          ...((functionProperties === null || functionProperties === void 0
+            ? void 0
+            : functionProperties.fnArgs) || []),
+        );
+        fnArgs.push(fnReturnValue);
+      }
       else if (
         (trimmed.startsWith(`"`) || trimmed.startsWith(`'`)) &&
         (trimmed.endsWith(`"`) || trimmed.endsWith(`'`))
