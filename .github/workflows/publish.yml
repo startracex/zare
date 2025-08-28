@@ -80,7 +80,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   release:
-    if: github.repository == 'IsmailBinMujeeb/zare'
+    if: github.ref == 'refs/heads/main' && github.repository == 'IsmailBinMujeeb/zare'
     runs-on: ubuntu-latest
     permissions:
       contents: write
