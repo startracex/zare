@@ -35,9 +35,6 @@ export function initCommand(program: Command) {
         const packageJson = await fs.readJSON(packageJsonPath);
 
         packageJson.name = promptAnswers.projectName;
-        packageJson.scripts = {};
-        packageJson.scripts.serve = `zare serve ${folderPath}`;
-        packageJson.scripts.build = `zare build ${folderPath}`;
 
         await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
         logger.info('package.json created');
