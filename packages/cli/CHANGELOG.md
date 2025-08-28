@@ -1,5 +1,15 @@
 # @zare/cli
 
+## 1.0.2
+
+### Patch Changes
+
+- 808230e: changed project path in serve and build command project package.json in init command
+- Updated dependencies [77cdef0]
+- Updated dependencies [d6d0c8c]
+- Updated dependencies [c9b737f]
+  - zare@2.6.0
+
 ## 1.0.1
 
 ### Patch Changes
