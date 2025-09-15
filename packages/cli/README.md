@@ -1,6 +1,6 @@
-# @Zare/CLI
+# @Zarejs/CLI
 
-> **@ZareCLI** — The official command-line interface for the **Zare Template Engine**. Designed for the modern JavaScript ecosystem, Zare CLI helps you initialize projects, compile templates, serve with hot-reload, and configure your application with ease.
+> **@Zarejs/CLI** — The official command-line interface for the **Zare Template Engine**. Designed for the modern JavaScript ecosystem, Zare CLI helps you initialize projects, compile templates, serve with hot-reload, and configure your application with ease.
 
 ---
 
@@ -21,7 +21,7 @@
 - **Configurable via `zare.config.js`**  
   Customizable build and runtime options using [`cosmiconfig`](https://github.com/cosmiconfig/cosmiconfig) standard.
 
-- 🗂 **File-Based Routing**  
+- **File-Based Routing**  
   Build routes based on your folder and file structure, enabling navigation setup.
 
 ---
@@ -29,7 +29,7 @@
 ## Installation
 
 ```bash
-npm install -g @zare/cli
+npm install -g @zarejs/cli
 ```
 
 ## Usage
