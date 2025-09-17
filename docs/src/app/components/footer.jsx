@@ -21,7 +21,6 @@ export default function FooterComponent() {
                     </div>
                     <div className="footer-section">
                         <h4>Resources</h4>
-                        <Link href="/blog">Blog</Link>
                         <Link href="/docs/get-started/intro">Documentation</Link>
                         <a href="https://github.com/IsmailBinMujeeb/zare/blob/main/packages/zare/CHANGELOG.md">Changelog</a>
                         <a href="https://github.com/IsmailBinMujeeb/zare/blob/main/packages/zare/README.md">Readme</a>
