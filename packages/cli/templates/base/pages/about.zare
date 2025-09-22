@@ -1,5 +1,5 @@
-link "/static/css/style"
-import "/static/css/main"
+link "/css/style"
+import "/js/main"
 as Base import "../base"
 
 
