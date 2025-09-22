@@ -1,9 +1,9 @@
-import { Command } from 'commander';
+import type { Command } from 'commander';
 import path from 'path';
 import fs from 'fs-extra';
-import { logger } from '../utils/logger';
+import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
-import { loadZareConfig } from '../utils/loadZareConfig';
+import { loadZareConfig } from '../utils/loadZareConfig.js';
 
 export function buildCommand(program: Command) {
   program.command('build <projectPath>').action(async (projectPath: string) => {
@@ -68,7 +68,7 @@ export function buildCommand(program: Command) {
       // Copying all included files and folders
       const includesFilesAndFolders = zareConfigurations.includes;
 
-      includesFilesAndFolders.forEach(async (f) => {
+      includesFilesAndFolders.forEach(async f => {
         const fPath = path.resolve(process.cwd(), projectPath, f);
         const fDestination = path.resolve(outDir, f);
 
@@ -77,7 +77,7 @@ export function buildCommand(program: Command) {
         }
 
         await fs.copy(fPath, fDestination);
-      })
+      });
 
       logger.done('build complete');
     } catch (error) {

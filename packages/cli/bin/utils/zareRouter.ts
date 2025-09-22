@@ -1,5 +1,4 @@
-import { Express, Response, Request, Router } from 'express';
-import { logger } from './logger';
+import { type Express, type Response, type Request, Router } from 'express';
 
 export class ZareRouter {
   private router: Router = Router();

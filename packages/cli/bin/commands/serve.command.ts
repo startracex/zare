@@ -1,11 +1,11 @@
-import { Command } from 'commander';
+import type { Command } from 'commander';
 import path from 'path';
 import fs from 'fs-extra';
-import app from '../server';
-import { ZareRouter } from '../utils/zareRouter';
-import { startWatcher } from '../utils/watcher';
-import { logger } from '../utils/logger';
-import { loadZareConfig } from '../utils/loadZareConfig';
+import app from '../server.js';
+import { ZareRouter } from '../utils/zareRouter.js';
+import { startWatcher } from '../utils/watcher.js';
+import { logger } from '../utils/logger.js';
+import { loadZareConfig } from '../utils/loadZareConfig.js';
 import express from 'express';
 
 export function serveCommand(program: Command) {
