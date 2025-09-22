@@ -6,15 +6,16 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**'],
     coverage: {
       provider: 'v8',
-      include: ['packages/**/*.ts', '!**/*.d.ts'],
+      include: ['packages/**/*.ts'],
       exclude: [
+        '**/*.d.ts',
         '**/tests/**',
         '**/*.config.*',
         '**/*.test.*',
         '**/node_modules/**',
         './packages/zare/lib/index.ts',
+        './packages/cli/**',
       ],
-
       reporter: ['text', 'html', 'lcov'],
     },
   },
