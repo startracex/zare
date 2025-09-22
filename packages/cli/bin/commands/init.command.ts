@@ -3,6 +3,9 @@ import { askInitPrompts } from '../prompts/init.prompt.js';
 import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function initCommand(program: Command) {
   program.command('init <folderPath>').action(async (folderPath: string) => {
