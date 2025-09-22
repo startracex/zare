@@ -1,7 +1,6 @@
-link "/css/style"
-import "/js/main"
 as Base import "../base"
 
+link "/css/style"
 
 serve (
     <Base>
