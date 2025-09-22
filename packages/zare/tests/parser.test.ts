@@ -3,7 +3,7 @@ import Lexer from '../lib/core/lexer';
 import Parser from '../lib/core/parser';
 import { describe, it, expect, beforeEach } from 'vitest';
 
-const root = resolve(import.meta.filename, '../..');
+const root = resolve(import.meta.dirname, '..');
 
 const render = (testCode: string, dummyParams = {}): string => {
   const tokens = new Lexer(testCode, '').start();

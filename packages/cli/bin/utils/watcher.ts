@@ -1,7 +1,7 @@
 import chokidar from 'chokidar';
 import { Server } from 'http';
-import app from '../server';
-import { logger } from './logger';
+import app from '../server.js';
+import { logger } from './logger.js';
 
 export function startWatcher(path: string, server: Server) {
   const watcher = chokidar.watch(path, {

@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 export function escapeHTML(str: string): string {
   return str.replace(/[&<>"']/g, char => {
@@ -41,6 +42,8 @@ export function sanitizeOptions(
 
   return sanitized;
 }
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function findNodeModules(startDir = __dirname) {
   let currentDir = startDir;

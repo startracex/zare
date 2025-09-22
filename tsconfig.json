@@ -6,6 +6,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["**/tests"],
-  "exclude": ["node_modules"]
+  "include": ["**/tests"]
 }
