@@ -9,55 +9,62 @@ import { loadZareConfig } from '../utils/loadZareConfig.js';
 import express from 'express';
 
 export function serveCommand(program: Command) {
-  program.command('serve <projectPath>').action(async (projectPath: string) => {
-    try {
-      const projectDestination = path.resolve(process.cwd(), projectPath);
+  program
+    .command('serve [projectPath]')
+    .action(async (projectPath: string = '.') => {
+      try {
+        const projectDestination = path.resolve(projectPath);
 
-      // Check if project directory exist or not
-      if (!(await fs.pathExists(projectDestination))) {
-        logger.error(`Project folder does not exists: ${projectDestination}`);
+        // Check if project directory exist or not
+        if (!(await fs.pathExists(projectDestination))) {
+          logger.error(`Project path does not exists: ${projectDestination}`);
+          process.exit(1);
+        }
+
+        if (!(await fs.stat(projectDestination)).isDirectory()) {
+          logger.error(`Project path is not a folder: ${projectDestination}`);
+          process.exit(1);
+        }
+
+        const zareConfigurations = await loadZareConfig(projectDestination);
+        const pagesDestination = path.resolve(
+          projectDestination,
+          zareConfigurations.pages,
+        );
+        const staticFilesDestination = path.resolve(
+          projectDestination,
+          zareConfigurations.static,
+        );
+
+        // pages as views
+        app.set('views', pagesDestination);
+        app.use(express.static(staticFilesDestination));
+
+        // Check if project directory exist or not
+        if (!(await fs.pathExists(pagesDestination))) {
+          logger.error(`Pages folder does not exists: ${pagesDestination}`);
+          process.exit(1);
+        }
+
+        logger.action('loading files');
+        const pagesFile = await fs.readdir(pagesDestination, 'utf-8');
+
+        fileRoutingHandler(pagesFile, pagesDestination);
+
+        const PORT = zareConfigurations.port;
+        app.set('port', PORT);
+
+        const server = app.listen(PORT, () => {
+          logger.done(`Server is running at http://localhost:${PORT}`);
+        });
+
+        startWatcher(pagesDestination, server);
+      } catch (error) {
+        if (error instanceof Error)
+          logger.error(`Failed to build project: ${error.message}`);
         process.exit(1);
       }
-
-      const zareConfigurations = await loadZareConfig(projectDestination);
-      const pagesDestination = path.resolve(
-        projectDestination,
-        zareConfigurations.pages,
-      );
-      const staticFilesDestination = path.resolve(
-        projectDestination,
-        zareConfigurations.static,
-      );
-
-      // pages as views
-      app.set('views', pagesDestination);
-      app.use(express.static(staticFilesDestination));
-
-      // Check if project directory exist or not
-      if (!(await fs.pathExists(pagesDestination))) {
-        logger.error(`Pages folder does not exists: ${pagesDestination}`);
-        process.exit(1);
-      }
-
-      logger.action('loading files');
-      const pagesFile = await fs.readdir(pagesDestination, 'utf-8');
-
-      fileRoutingHandler(pagesFile, pagesDestination);
-
-      const PORT = zareConfigurations.port;
-      app.set('port', PORT);
-
-      const server = app.listen(PORT, () => {
-        logger.done(`Server is running at http://localhost:${PORT}`);
-      });
-
-      startWatcher(pagesDestination, server);
-    } catch (error) {
-      if (error instanceof Error)
-        logger.error(`Failed to build project: ${error.message}`);
-      process.exit(1);
-    }
-  });
+    });
 }
 
 async function fileRoutingHandler(

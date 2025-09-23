@@ -4,50 +4,47 @@ import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import { fileURLToPath } from 'url';
+import { cpDir } from '../utils/cpdir.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function initCommand(program: Command) {
-  program.command('init <folderPath>').action(async (folderPath: string) => {
-    try {
-      const promptAnswers = await askInitPrompts();
+  program
+    .command('init [projectPath]')
+    .action(async (defaultPath: string = '') => {
+      try {
+        const promptAnswers = await askInitPrompts({ defaultPath });
 
-      const templatePath = path.resolve(__dirname, '../../templates/base');
-      const destinationPath = path.resolve(process.cwd(), folderPath);
+        const destinationPath = path.resolve(
+          promptAnswers.projectPath || defaultPath,
+        );
+        const templatePath = path.resolve(__dirname, '../../templates/base');
 
-      // Check if template exists
-      if (!(await fs.pathExists(templatePath))) {
-        logger.error(`Template not found at: ${templatePath}`);
+        await cpDir(templatePath, destinationPath);
+        logger.info('template copied');
+
+        // update package name generated previously
+        if (promptAnswers.packageName) {
+          const packageJsonPath = path.join(destinationPath, 'package.json');
+          const jsonData = await fs.readJSON(packageJsonPath);
+          if (jsonData.name !== promptAnswers.packageName) {
+            await fs.writeJSON(
+              packageJsonPath,
+              {
+                ...jsonData,
+                name: promptAnswers.packageName,
+              },
+              { spaces: 2 },
+            );
+            logger.action('updated package.json');
+          }
+        }
+
+        logger.done('project initialized');
+      } catch (error) {
+        if (error instanceof Error)
+          logger.error(`Failed to initialize project: ${error.message}`);
         process.exit(1);
       }
-
-      // Check if destination already exists
-      if (await fs.pathExists(destinationPath)) {
-        logger.error(`Destination folder already exists: ${destinationPath}`);
-        process.exit(1);
-      }
-
-      await fs.copy(templatePath, destinationPath);
-
-      logger.info('template copied');
-
-      const packageJsonPath = path.resolve(destinationPath, 'package.json');
-
-      if (await fs.pathExists(packageJsonPath)) {
-        logger.action('creating package.json');
-        const packageJson = await fs.readJSON(packageJsonPath);
-
-        packageJson.name = promptAnswers.projectName;
-
-        await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-        logger.info('package.json created');
-      }
-
-      logger.done('project intialized');
-    } catch (error) {
-      if (error instanceof Error)
-        logger.error(`Failed to initialize project: ${error.message}`);
-      process.exit(1);
-    }
-  });
+    });
 }
