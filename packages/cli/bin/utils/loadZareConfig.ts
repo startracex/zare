@@ -1,6 +1,11 @@
 import { cosmiconfig } from 'cosmiconfig';
 
+type StaticParams = Record<string, (string | number)[]>;
+
 interface IZareConfig {
+  generateStaticParams?: (
+    path?: string,
+  ) => StaticParams | Promise<StaticParams>;
   port: number;
   static: string;
   outdir: string;
@@ -28,12 +33,11 @@ export async function loadZareConfig(searchFrom: string): Promise<IZareConfig> {
 
   const configs = await result.config;
 
-  return {
-    port: configs.port || 8185,
-    static: configs.static || './static',
-    outdir: configs.outdir || './dist',
-    pages: configs.pages || './pages',
-    includes: configs.includes || [],
-    tailwind: configs.tailwind || false,
-  };
+  configs.port ||= 8185;
+  configs.static ||= './static';
+  configs.outdir ||= './dist';
+  configs.pages ||= './pages';
+  configs.includes ||= [];
+  configs.tailwind || false;
+  return configs;
 }
