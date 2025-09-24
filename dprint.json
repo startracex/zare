@@ -7,7 +7,7 @@
     "**/*.d.ts",
     "**/CHANGELOG.md",
     ".changeset/*.md",
-    "docs/public/_pagefind"
+    "**/_pagefind"
   ],
   "includes": ["**/*.ts", "**/*.jsx", "**/*.md", "**/*.json"],
   "prettier": {
