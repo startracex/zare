@@ -18,3 +18,18 @@ This directory will contains the static files. By default, it's `./static`.
 
 This directory will contains **views** files. By default, it's `./pages`.
 
+### `generateStaticParams`
+
+The `generateStaticParams` function generates static parameter values for dynamic routes.
+
+#### Type Declaration
+
+```ts
+type StaticParams = Record<string, (string | number)[]>;
+
+interface IZareConfig {
+  generateStaticParams?: (
+    path?: string,
+  ) => StaticParams | Promise<StaticParams>;
+}
+```

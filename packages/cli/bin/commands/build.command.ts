@@ -6,6 +6,73 @@ import renderer from 'zare/dist/core/renderer.js';
 import { loadZareConfig } from '../utils/loadZareConfig.js';
 import { cpDir } from '../utils/cpdir.js';
 
+function generateAllPaths(
+  pathTemplate: string,
+  params: Record<string, (string | number)[]> = {},
+): Record<string, Record<string, string | number>> {
+  const paramNames =
+    pathTemplate.match(/\[(\w+)\]/g)?.map(match => match.slice(1, -1)) || [];
+
+  const pathMap: Record<string, Record<string, string | number>> = {};
+  let allPaths = [{ path: pathTemplate, params: {} }];
+
+  for (const param of paramNames) {
+    const newPaths = [];
+
+    for (const item of allPaths) {
+      const iter = params[param];
+      if (!iter) {
+        continue;
+      }
+      for (const value of iter) {
+        const newPath = item.path.replace(`[${param}]`, value + '');
+        const newParams = { ...item.params, [param]: value };
+        newPaths.push({ path: newPath, params: newParams });
+      }
+    }
+
+    allPaths = newPaths;
+  }
+
+  allPaths.forEach(item => {
+    pathMap[item.path] = item.params;
+  });
+
+  return pathMap;
+}
+
+async function getAllFiles(dir: string): Promise<string[]> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const filePath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      const subDirFiles = await getAllFiles(filePath);
+      files.push(...subDirFiles);
+    } else {
+      files.push(filePath);
+    }
+  }
+  return files;
+}
+
+async function renderPage(
+  pagePath: string,
+  outputPath: string,
+  renderOptions: Record<string, any> = {},
+) {
+  const fileContent = await fs.readFile(pagePath, 'utf-8');
+  const outputHtmlContent = await renderer(
+    fileContent,
+    renderOptions,
+    pagePath,
+  );
+  if (!(await fs.exists(outputPath))) {
+    await fs.createFile(outputPath);
+  }
+  await fs.writeFile(outputPath, outputHtmlContent);
+}
+
 export function buildCommand(program: Command) {
   program
     .command('build [projectPath]')
@@ -15,10 +82,7 @@ export function buildCommand(program: Command) {
           path.resolve(projectPath),
         );
 
-        const projectDestination = path.resolve(
-          projectPath,
-          zareConfigurations.pages,
-        );
+        const projectDestination = path.resolve(projectPath);
         const outDir = path.resolve(projectPath, zareConfigurations.outdir);
 
         logger.action('checking project destination');
@@ -41,32 +105,32 @@ export function buildCommand(program: Command) {
         }
 
         logger.action('loading pages');
-        const pagesFile = await fs.readdir(projectDestination, 'utf-8');
+        const pagesDir = path.join(
+          projectDestination,
+          zareConfigurations.pages,
+        );
+        const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
+          f.toLowerCase().endsWith('.zare'),
+        );
 
-        for (const file of pagesFile) {
-          const filePath = path.resolve(projectDestination, file).trimEnd();
-          const fileExtension = path.extname(filePath).toLowerCase();
+        for (const pagePath of pagePaths) {
+          const fileBaseName = path
+            .relative(pagesDir, pagePath)
+            .slice(0, -'.zare'.length)
+            .replace(/\\/g, '/');
 
-          if (fileExtension !== '.zare') {
-            logger.warn(`can't load ${fileExtension} files`);
-            continue;
+          const staticParams = /\[(\w+)\]/.test(fileBaseName)
+            ? await zareConfigurations.generateStaticParams?.(fileBaseName)
+            : undefined;
+
+          const allPaths = generateAllPaths(fileBaseName, staticParams);
+
+          for (const generatedPath in allPaths) {
+            const outputPath = path.join(outDir, `${generatedPath}.html`);
+            await renderPage(pagePath, outputPath, {
+              params: allPaths[generatedPath],
+            });
           }
-
-          const fileBaseName = path.basename(filePath, fileExtension);
-          const fileContent = await fs.readFile(filePath, 'utf-8');
-          const outputHtmlContent = await renderer(fileContent, {}, filePath);
-
-          const outputHtmlFileNameWithExtension = `${fileBaseName}.html`;
-          const outputHtmlFilePath = path.resolve(
-            outDir,
-            outputHtmlFileNameWithExtension,
-          );
-
-          if (!(await fs.exists(outputHtmlFilePath))) {
-            await fs.createFile(outputHtmlFilePath);
-          }
-
-          await fs.writeFile(outputHtmlFilePath, outputHtmlContent);
         }
 
         // Copying all included files and folders
