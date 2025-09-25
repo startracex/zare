@@ -3,7 +3,6 @@ module.exports = {
   static: "./static",
   pages: "./pages",
   outdir: "./dist",
-  includes: ["./static"],
   generateStaticParams(path) {
     switch (path) {
       case "user/[id]":
