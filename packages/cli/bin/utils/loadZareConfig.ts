@@ -7,10 +7,13 @@ interface IZareConfig {
     path?: string,
   ) => StaticParams | Promise<StaticParams>;
   port: number;
-  static: string;
+  static: string | string[];
   outdir: string;
   pages: string;
-  includes: string[];
+  /**
+   * @deprecated use static instead
+   */
+  includes?: string[];
   tailwind: boolean;
 }
 
@@ -31,7 +34,7 @@ export async function loadZareConfig(searchFrom: string): Promise<IZareConfig> {
     throw new Error('no zare configuration found');
   }
 
-  const configs = await result.config;
+  const configs: IZareConfig = await result.config;
 
   configs.port ||= 8185;
   configs.static ||= './static';

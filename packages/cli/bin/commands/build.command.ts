@@ -134,17 +134,13 @@ export function buildCommand(program: Command) {
         }
 
         // Copying all included files and folders
-        const includesFilesAndFolders = zareConfigurations.includes;
-
-        includesFilesAndFolders.forEach(async f => {
-          const fPath = path.resolve(process.cwd(), projectPath, f);
-          const fDestination = path.resolve(outDir, f);
-
-          if (!(await fs.exists(fPath))) {
-            return logger.warn(`${fPath} does not exist`);
-          }
-
-          await cpDir(fPath, fDestination);
+        (Array.isArray(zareConfigurations.static)
+          ? zareConfigurations.static
+          : [zareConfigurations.static]
+        ).forEach(async staticItem => {
+          const staticDest = path.resolve(projectPath, staticItem);
+          await fs.mkdir(outDir, { recursive: true });
+          await cpDir(staticDest, outDir);
         });
 
         logger.done('build complete');
