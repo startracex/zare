@@ -1,5 +1,23 @@
 # @zare/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- a084cac: deprecate includes
+
+  output static files to the root directory
+
+- bca8aa8: let path parameter optional
+- 37301ef: support static generation for dynamic routes
+
+### Patch Changes
+
+- 83153fb: correctly get the directory path in ES modules
+- 2237838: replaces myapp with . in serve and build command of cli base template
+- Updated dependencies [83153fb]
+  - zare@2.6.1
+
 ## 1.0.2
 
 ### Patch Changes
