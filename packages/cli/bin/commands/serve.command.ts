@@ -31,14 +31,17 @@ export function serveCommand(program: Command) {
           projectDestination,
           zareConfigurations.pages,
         );
-        const staticFilesDestination = path.resolve(
-          projectDestination,
-          zareConfigurations.static,
-        );
 
         // pages as views
         app.set('views', pagesDestination);
-        app.use(express.static(staticFilesDestination));
+
+        (Array.isArray(zareConfigurations.static)
+          ? zareConfigurations.static
+          : [zareConfigurations.static]
+        ).forEach(staticItem => {
+          const staticDest = path.resolve(projectDestination, staticItem);
+          app.use(express.static(staticDest));
+        });
 
         // Check if project directory exist or not
         if (!(await fs.pathExists(pagesDestination))) {
