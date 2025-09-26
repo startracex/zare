@@ -1,5 +1,11 @@
 # zare
 
+## 2.6.1
+
+### Patch Changes
+
+- 83153fb: correctly get the directory path in ES modules
+
 ## 2.6.0
 
 ### Minor Changes
