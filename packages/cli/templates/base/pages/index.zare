@@ -2,7 +2,7 @@ as Base import "../base"
 as Navbar import "../components/navbar"
 as Footer import "../components/footer"
 
-link "/css/index"
+link "./css/index"
 
 serve (
     <Base>

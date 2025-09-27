@@ -1,4 +1,4 @@
-link "/css/footer"
+link "./css/footer"
 
 serve (
     <footer class="footer">
