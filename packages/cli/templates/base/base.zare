@@ -1,4 +1,4 @@
-link "/css/style"
+link "./css/style"
 
 serve (
     <!DOCTYPE html>

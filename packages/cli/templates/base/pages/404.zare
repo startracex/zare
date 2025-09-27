@@ -1,6 +1,6 @@
 as Base import "../base"
 
-link "/css/errorNotFound"
+link "./css/errorNotFound"
 
 serve (
     <Base>

@@ -1,5 +1,5 @@
-link "/css/navbar"
-import "/js/navbar"
+link "./css/navbar"
+import "./js/navbar"
 
 serve (
     <nav class="navbar">
