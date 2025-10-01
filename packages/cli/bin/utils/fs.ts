@@ -12,10 +12,29 @@ export async function cpDir(src: string, dest: string) {
 
     if (entry.isDirectory()) {
       return cpDir(srcPath, destPath);
-    } else if (entry.isFile()) {
+    }
+    if (entry.isFile()) {
       return fs.copyFile(srcPath, destPath);
     }
   });
 
   await Promise.all(promises);
+}
+
+export async function getAllFiles(dir: string): Promise<string[]> {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+
+  const promises = entries.map(async entry => {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isFile()) {
+      return [fullPath];
+    }
+    if (entry.isDirectory()) {
+      return getAllFiles(fullPath);
+    }
+    return [];
+  });
+
+  const results = await Promise.all(promises);
+  return results.flat();
 }
