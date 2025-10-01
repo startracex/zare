@@ -22,10 +22,14 @@ This directory will contains **views** files. By default, it's `./pages`.
 
 The `generateStaticParams` function generates static parameter values for dynamic routes.
 
+For static exports (`zare build`), if there are dynamic routes,
+the parameter with the same name as the dynamic segment must be of type `(string | number)[]`.
+Zare will enumerate all possible combinations.
+
 #### Type Declaration
 
 ```ts
-type StaticParams = Record<string, (string | number)[]>;
+type StaticParams = Record<string, any[]>;
 
 interface IZareConfig {
   generateStaticParams?: (

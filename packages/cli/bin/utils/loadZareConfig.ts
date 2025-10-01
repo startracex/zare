@@ -1,6 +1,6 @@
 import { cosmiconfig } from 'cosmiconfig';
 
-type StaticParams = Record<string, (string | number)[]>;
+type StaticParams = Record<string, any[]>;
 
 interface IZareConfig {
   generateStaticParams?: (

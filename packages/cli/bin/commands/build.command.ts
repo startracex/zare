@@ -105,16 +105,20 @@ export function buildCommand(program: Command) {
               .slice(0, -'.zare'.length)
               .replace(/\\/g, '/');
 
-            const staticParams = /\[(\w+)\]/.test(baseName)
-              ? await zareConfigurations.generateStaticParams?.(baseName)
-              : undefined;
+            const staticParams =
+              await zareConfigurations.generateStaticParams?.(baseName);
 
             const allPaths = generateAllPaths(baseName, staticParams);
 
             return Promise.all(
               Object.entries(allPaths).map(async ([generatedPath, params]) => {
                 const outputPath = path.join(outDir, `${generatedPath}.html`);
-                await renderPage(pagePath, outputPath, { params });
+                await renderPage(pagePath, outputPath, {
+                  params: {
+                    ...staticParams,
+                    ...params,
+                  },
+                });
               }),
             );
           }),
