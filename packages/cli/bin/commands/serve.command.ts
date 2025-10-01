@@ -7,6 +7,7 @@ import { startWatcher } from '../utils/watcher.js';
 import { logger } from '../utils/logger.js';
 import { loadZareConfig } from '../utils/loadZareConfig.js';
 import express from 'express';
+import { getAllFiles } from '../utils/fs.js';
 
 export function serveCommand(program: Command) {
   program
@@ -50,9 +51,7 @@ export function serveCommand(program: Command) {
         }
 
         logger.action('loading files');
-        const pagesFile = await fs.readdir(pagesDestination, 'utf-8');
-
-        fileRoutingHandler(pagesFile, pagesDestination);
+        await fileRoutingHandler(pagesDestination);
 
         const PORT = zareConfigurations.port;
         app.set('port', PORT);
@@ -70,38 +69,22 @@ export function serveCommand(program: Command) {
     });
 }
 
-async function fileRoutingHandler(
-  pagesFile: string[],
-  pagesDestination: string,
-  prefix: string = '',
-) {
-  const routes: string[] = [];
+async function fileRoutingHandler(pagesDir: string) {
+  const routes: string[] = (await getAllFiles(pagesDir))
+    .filter(pagePath => pagePath.endsWith('.zare'))
+    .map(pagePath => {
+      const baseName = path
+        .relative(pagesDir, pagePath)
+        .slice(0, -'.zare'.length)
+        .replace(/\\/g, '/');
+      return (
+        '/' +
+        (baseName.endsWith('/index')
+          ? baseName.slice(0, -'/index'.length)
+          : baseName)
+      );
+    });
 
-  for (const file of pagesFile) {
-    const filePath = path.resolve(pagesDestination, file).trimEnd();
-    const fileExtension = path.extname(filePath).toLowerCase();
-
-    if (fileExtension !== '.zare') {
-      const pathStats = await fs.stat(filePath);
-
-      if (!pathStats.isDirectory) {
-        // Skip and warn if this is not a zare file and directory
-        logger.warn(`can't load ${fileExtension} files`);
-        continue;
-      }
-
-      logger.action(`loading sub pages of ${file}`);
-      const subPagesFileDestination = path.resolve(pagesDestination, file);
-      const subPagesFile = await fs.readdir(subPagesFileDestination, 'utf-8');
-
-      fileRoutingHandler(subPagesFile, subPagesFileDestination, file);
-      continue;
-    }
-
-    const fileBaseName = path.basename(filePath, fileExtension);
-
-    routes.push(`${prefix ? `/${prefix}` : ''}/${fileBaseName}`);
-  }
   const router = new ZareRouter(routes);
   router.loadRoutes(app);
   app.use(`/`, router.getRoutes());

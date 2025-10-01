@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
 import { loadZareConfig } from '../utils/loadZareConfig.js';
-import { cpDir } from '../utils/cpdir.js';
+import { cpDir, getAllFiles } from '../utils/fs.js';
 
 function generateAllPaths(
   pathTemplate: string,
@@ -39,21 +39,6 @@ function generateAllPaths(
   });
 
   return pathMap;
-}
-
-async function getAllFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    const filePath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      const subDirFiles = await getAllFiles(filePath);
-      files.push(...subDirFiles);
-    } else {
-      files.push(filePath);
-    }
-  }
-  return files;
 }
 
 async function renderPage(

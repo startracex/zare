@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import { fileURLToPath } from 'url';
-import { cpDir } from '../utils/cpdir.js';
+import { cpDir } from '../utils/fs.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

@@ -8,7 +8,6 @@ export function startWatcher(path: string, server: Server) {
     persistent: true,
     usePolling: false,
     ignoreInitial: true,
-    depth: 2,
     awaitWriteFinish: {
       stabilityThreshold: 200,
       pollInterval: 100,
