@@ -18,6 +18,7 @@ export default (
     sanitized,
     filePath.replace(/[\/\\][^\/\\]+$/, ''),
   );
+  parserInstance.filePath = filePath;
   const parsed: string = parserInstance.parse();
 
   const html = parserInstance.parameterExecuter(parsed);

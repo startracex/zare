@@ -10,6 +10,9 @@ import path from 'path';
 import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
 import { findNodeModules } from '../utils/helper.js';
+import { createRequire } from 'module';
+import { config } from './config.js';
+
 
 const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
@@ -27,8 +30,8 @@ const REGEX_END_STYLE_TAG = /^<\/.*style>$/;
 const REGEX_END_SCRIPT_TAG = /^<\/.*script>$/;
 const REGEX_HEAD_TAG = /<head[^>]*>/i;
 const REGEX_PATH_STRING = /"([:.]?[\.\/]?[\w.\-\/ ]*)"/;
-const REGEX_CSS_PATH = /^"(\.?\/.*)"$/;
-const REGEX_JS_PATH = /^"(\.?\/.*)"$/;
+const REGEX_CSS_PATH = /^"((\/.*)|(\.?\.\/.*)|(#.*))"$/;
+const REGEX_JS_PATH = /^"((\/.*)|(\.?\.\/.*)|(#.*))"$/;
 const REGEX_FN_PARAMS = /^[a-zA-Z0-9.]+$/;
 const REGEX_FN_CALLS_IN_FN_ARGS = /\b([a-zA-Z_]\w*)\s*\(\s*([^()]*?)\s*\)/;
 const REGEX_EACH_EXPRESSION = /\((.*?)\)/;
@@ -42,6 +45,7 @@ export default class Parser {
   linker: Scope;
   script: Scope;
   functions: Scope;
+  filePath: string = '';
 
   constructor(
     private tokens: Token[],
@@ -475,7 +479,10 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const resolvedValue = value.endsWith('.js') ? value : `${value}.js`;
+      const require = createRequire(this.filePath || process.cwd());
+      let resolvedValue = require.resolve(value);
+      resolvedValue = path.relative(config.staticDir, resolvedValue);
+      resolvedValue = '/' + resolvedValue.replace(/\\/g, '/');
       const jsScriptTag = `\n<script src="${resolvedValue}" defer/></script>`;
 
       if (titleTagIndex !== -1) {
@@ -509,7 +516,11 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const resolvedValue = value.endsWith('.css') ? value : `${value}.css`;
+      const require = createRequire(this.filePath || process.cwd());
+      let resolvedValue = require.resolve(value);
+
+      resolvedValue = path.relative(config.staticDir, resolvedValue);
+      resolvedValue = '/' + resolvedValue.replace(/\\/g, '/');
       const cssLinkTag = `\n<link rel="stylesheet" href="${resolvedValue}" />`;
 
       if (titleTagIndex !== -1) {
@@ -610,16 +621,14 @@ export default class Parser {
                 const componentDir = componentString.startsWith(':')
                   ? findNodeModules() || ''
                   : this.__view;
-                const componentPath = path.resolve(
+                let componentPath = path.resolve(
                   componentDir,
                   componentString.replace(':', ''),
                 );
-                const content: string = fs.readFileSync(
-                  componentPath.endsWith('.zare')
-                    ? componentPath
-                    : `${componentPath}.zare`,
-                  'utf-8',
-                );
+                componentPath = componentPath.endsWith('.zare')
+                  ? componentPath
+                  : `${componentPath}.zare`;
+                const content: string = fs.readFileSync(componentPath, 'utf-8');
 
                 const tokenizer: Lexer = new Lexer(
                   content,
@@ -635,7 +644,7 @@ export default class Parser {
                   this.linker,
                   this.script,
                 );
-
+                componentParser.filePath = componentPath;
                 this.scope.define(componentName, componentParser);
                 this.eat();
               } else
@@ -680,9 +689,7 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            this.linker.parent
-              ? this.linker.parent.define(cssPath, cssPath)
-              : this.linker.define(cssPath, cssPath);
+            this.linker.define(cssPath, cssPath);
             this.eat();
           } else
             throw Syntax_Error.toString('Syntax Error', {
@@ -708,9 +715,9 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            this.script.parent
+            /* this.script.parent
               ? this.script.parent.define(jsPath, jsPath)
-              : this.script.define(jsPath, jsPath);
+              :  */ this.script.define(jsPath, jsPath);
             this.eat();
           } else
             throw Syntax_Error.toString('Syntax Error', {
