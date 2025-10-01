@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
 import { loadZareConfig } from '../utils/loadZareConfig.js';
-import { cpDir } from '../utils/cpdir.js';
+import { cpDir, getAllFiles } from '../utils/fs.js';
 
 function generateAllPaths(
   pathTemplate: string,
@@ -39,21 +39,6 @@ function generateAllPaths(
   });
 
   return pathMap;
-}
-
-async function getAllFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    const filePath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      const subDirFiles = await getAllFiles(filePath);
-      files.push(...subDirFiles);
-    } else {
-      files.push(filePath);
-    }
-  }
-  return files;
 }
 
 async function renderPage(
@@ -110,28 +95,30 @@ export function buildCommand(program: Command) {
           zareConfigurations.pages,
         );
         const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
-          f.toLowerCase().endsWith('.zare'),
+          f.endsWith('.zare'),
         );
 
-        for (const pagePath of pagePaths) {
-          const fileBaseName = path
-            .relative(pagesDir, pagePath)
-            .slice(0, -'.zare'.length)
-            .replace(/\\/g, '/');
+        await Promise.all(
+          pagePaths.map(async pagePath => {
+            const baseName = path
+              .relative(pagesDir, pagePath)
+              .slice(0, -'.zare'.length)
+              .replace(/\\/g, '/');
 
-          const staticParams = /\[(\w+)\]/.test(fileBaseName)
-            ? await zareConfigurations.generateStaticParams?.(fileBaseName)
-            : undefined;
+            const staticParams = /\[(\w+)\]/.test(baseName)
+              ? await zareConfigurations.generateStaticParams?.(baseName)
+              : undefined;
 
-          const allPaths = generateAllPaths(fileBaseName, staticParams);
+            const allPaths = generateAllPaths(baseName, staticParams);
 
-          for (const generatedPath in allPaths) {
-            const outputPath = path.join(outDir, `${generatedPath}.html`);
-            await renderPage(pagePath, outputPath, {
-              params: allPaths[generatedPath],
-            });
-          }
-        }
+            return Promise.all(
+              Object.entries(allPaths).map(async ([generatedPath, params]) => {
+                const outputPath = path.join(outDir, `${generatedPath}.html`);
+                await renderPage(pagePath, outputPath, { params });
+              }),
+            );
+          }),
+        );
 
         // Copying all included files and folders
         (Array.isArray(zareConfigurations.static)
