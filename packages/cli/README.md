@@ -18,9 +18,6 @@
 - **Hot Reloading**  
   Real-time reloads using `chokidar` to monitor file changes during development.
 
-- **Configurable via `zare.config.js`**  
-  Customizable build and runtime options using [`cosmiconfig`](https://github.com/cosmiconfig/cosmiconfig) standard.
-
 - **File-Based Routing**  
   Build routes based on your folder and file structure, enabling navigation setup.
 
