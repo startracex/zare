@@ -68,7 +68,7 @@ export function buildCommand(program: Command) {
         );
 
         const projectDestination = path.resolve(projectPath);
-        const outDir = path.resolve(projectPath, zareConfigurations.outdir);
+        const outDir = path.resolve(projectPath, zareConfigurations.outdir!);
 
         logger.action('checking project destination');
 
@@ -92,7 +92,7 @@ export function buildCommand(program: Command) {
         logger.action('loading pages');
         const pagesDir = path.join(
           projectDestination,
-          zareConfigurations.pages,
+          zareConfigurations.pages!,
         );
         const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
           f.toLowerCase().endsWith('.zare'),
@@ -117,13 +117,12 @@ export function buildCommand(program: Command) {
             });
           }
         }
-
         // Copying all included files and folders
         (Array.isArray(zareConfigurations.static)
           ? zareConfigurations.static
           : [zareConfigurations.static]
         ).forEach(async staticItem => {
-          const staticDest = path.resolve(projectPath, staticItem);
+          const staticDest = path.resolve(projectPath, staticItem!);
           await fs.mkdir(outDir, { recursive: true });
           await cpDir(staticDest, outDir);
         });

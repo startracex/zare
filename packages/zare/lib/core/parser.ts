@@ -11,8 +11,7 @@ import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
 import { findNodeModules } from '../utils/helper.js';
 import { createRequire } from 'module';
-import { config } from './config.js';
-
+import { config } from '../config.js';
 
 const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
@@ -479,10 +478,21 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const require = createRequire(this.filePath || process.cwd());
       let resolvedValue = require.resolve(value);
-      resolvedValue = path.relative(config.staticDir, resolvedValue);
-      resolvedValue = '/' + resolvedValue.replace(/\\/g, '/');
+
+      const staticDirs = config.userConfig!.static! as string[];
+
+      let staticRelative: string | undefined;
+      for (const staticDir of staticDirs) {
+        staticRelative = path.relative(staticDir, resolvedValue);
+        if (!staticRelative.startsWith('..')) {
+          resolvedValue = '/' + staticRelative.replace(/\\/g, '/');
+          break;
+        }
+      }
+      if (!staticRelative && staticDirs.length) {
+        throw new Error(`can not resolve static file: ${value}`);
+      }
       const jsScriptTag = `\n<script src="${resolvedValue}" defer/></script>`;
 
       if (titleTagIndex !== -1) {
@@ -519,8 +529,19 @@ export default class Parser {
       const require = createRequire(this.filePath || process.cwd());
       let resolvedValue = require.resolve(value);
 
-      resolvedValue = path.relative(config.staticDir, resolvedValue);
-      resolvedValue = '/' + resolvedValue.replace(/\\/g, '/');
+      const staticDirs = config.userConfig!.static! as string[];
+
+      let staticRelative: string | undefined;
+      for (const staticDir of staticDirs) {
+        staticRelative = path.relative(staticDir, resolvedValue);
+        if (!staticRelative.startsWith('..')) {
+          resolvedValue = '/' + staticRelative.replace(/\\/g, '/');
+          break;
+        }
+      }
+      if (!staticRelative && staticDirs.length) {
+        throw new Error(`can not resolve static file: ${value}`);
+      }
       const cssLinkTag = `\n<link rel="stylesheet" href="${resolvedValue}" />`;
 
       if (titleTagIndex !== -1) {

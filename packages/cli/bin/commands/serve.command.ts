@@ -30,7 +30,7 @@ export function serveCommand(program: Command) {
         const zareConfigurations = await loadZareConfig(projectDestination);
         const pagesDestination = path.resolve(
           projectDestination,
-          zareConfigurations.pages,
+          zareConfigurations.pages!,
         );
 
         // pages as views
@@ -40,7 +40,7 @@ export function serveCommand(program: Command) {
           ? zareConfigurations.static
           : [zareConfigurations.static]
         ).forEach(staticItem => {
-          const staticDest = path.resolve(projectDestination, staticItem);
+          const staticDest = path.resolve(projectDestination, staticItem!);
           app.use(express.static(staticDest));
         });
 

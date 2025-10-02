@@ -1,46 +1,31 @@
-import { cosmiconfig } from 'cosmiconfig';
+import { dirname, resolve } from 'path';
+import { config } from 'zare/config.js';
+import { loadConfig, type ZareCoreConfig } from 'zare/utils/shared.js';
 
-type StaticParams = Record<string, (string | number)[]>;
-
-interface IZareConfig {
-  generateStaticParams?: (
-    path?: string,
-  ) => StaticParams | Promise<StaticParams>;
-  port: number;
-  static: string | string[];
-  outdir: string;
-  pages: string;
-  /**
-   * @deprecated use static instead
-   */
-  includes?: string[];
-  tailwind: boolean;
+interface IZareConfig extends ZareCoreConfig {
+  port?: number;
+  outdir?: string;
+  pages?: string;
+  tailwind?: boolean;
 }
 
 export async function loadZareConfig(searchFrom: string): Promise<IZareConfig> {
-  const explorer = cosmiconfig('zare', {
-    searchPlaces: [
-      'zare.config.js',
-      'zare.config.cjs',
-      'zare.config.mjs',
-      '.zarerc',
-      '.zarerc.json',
-    ],
-  });
+  const configs = await loadConfig(searchFrom);
+  config.configPath = configs[0];
+  config.userConfig = {
+    port: 8185,
+    static: './static',
+    outdir: './dist',
+    pages: './pages',
+    tailwind: false,
+    ...configs[1],
+  } as IZareConfig;
 
-  const result = await explorer.search(searchFrom);
+  config.userConfig.static = Array.isArray(config.userConfig.static)
+    ? config.userConfig.static
+    : [config.userConfig.static!].map((s) =>
+        resolve(dirname(config.configPath || process.cwd()), s),
+      );
 
-  if (!result || result.isEmpty) {
-    throw new Error('no zare configuration found');
-  }
-
-  const configs: IZareConfig = await result.config;
-
-  configs.port ||= 8185;
-  configs.static ||= './static';
-  configs.outdir ||= './dist';
-  configs.pages ||= './pages';
-  configs.includes ||= [];
-  configs.tailwind || false;
-  return configs;
+  return config.userConfig;
 }
