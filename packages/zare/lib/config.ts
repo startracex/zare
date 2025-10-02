@@ -13,7 +13,7 @@ export const config: {
 } = {};
 
 export class ZareConfig {
-  static pathFields: string[] = ['staticDir'];
+  static pathFields: string[] = ['staticDir', 'pagesDir', 'outDir'];
   static defaultValues = {
     staticDir: ['static'],
     pagesDir: 'pages',
@@ -39,10 +39,13 @@ export class ZareConfig {
 
   normalizePathFields() {
     (this.constructor as typeof ZareConfig).pathFields.forEach(pathField => {
-      // @ts-ignore
-      this.options[pathField] = mapOrApply(this.options[pathField], item =>
-        resolve(this.configDir!, item),
-      );
+        // @ts-ignore
+      if (this.options[pathField]) {
+        // @ts-ignore
+        this.options[pathField] = mapOrApply(this.options[pathField], item =>
+          resolve(this.configDir, item),
+        );
+      }
     });
   }
 
