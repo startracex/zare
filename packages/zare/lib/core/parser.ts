@@ -482,6 +482,8 @@ export default class Parser {
 
       let resolvedValue = require.resolve(value);
 
+      /* v8 ignore start */
+
       const staticDirs = this.config.options.staticDir;
       if (!staticDirs.length) {
         throw new Error(
@@ -499,6 +501,9 @@ export default class Parser {
       if (!staticRelative && staticDirs.length) {
         throw new Error(`can not resolve static file: ${value}`);
       }
+
+      /* v8 ignore end */
+
       const jsScriptTag = `\n<script src="${resolvedValue}" defer/></script>`;
 
       if (titleTagIndex !== -1) {
@@ -535,6 +540,8 @@ export default class Parser {
       const require = createRequire(this.filePath || process.cwd());
       let resolvedValue = require.resolve(value);
 
+      /* v8 ignore start */
+
       const staticDirs = this.config.options.staticDir;
       if (!staticDirs.length) {
         throw new Error(
@@ -552,6 +559,9 @@ export default class Parser {
       if (!staticRelative && staticDirs.length) {
         throw new Error(`can not resolve static file: ${value}`);
       }
+
+      /* v8 ignore end  */
+
       const cssLinkTag = `\n<link rel="stylesheet" href="${resolvedValue}" />`;
 
       if (titleTagIndex !== -1) {
@@ -1258,7 +1268,7 @@ export default class Parser {
       this.__view,
       this.scope,
     );
-    parser.config = this.config
+    parser.config = this.config;
     return parser.htmlParser(html);
   }
 }

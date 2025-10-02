@@ -34,7 +34,7 @@ export class ZareConfig {
 
   normalizePathFields() {
     (this.constructor as typeof ZareConfig).pathFields.forEach(pathField => {
-        // @ts-ignore
+      // @ts-ignore
       if (this.options[pathField]) {
         // @ts-ignore
         this.options[pathField] = mapOrApply(this.options[pathField], item =>

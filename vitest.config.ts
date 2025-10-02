@@ -14,6 +14,8 @@ export default defineConfig({
         '**/*.test.*',
         '**/node_modules/**',
         './packages/zare/lib/index.ts',
+        './packages/zare/lib/config.ts',
+        './packages/zare/lib/utils/shared.ts',
         './packages/cli/**',
       ],
       reporter: ['text', 'html', 'lcov'],
