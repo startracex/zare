@@ -5,42 +5,39 @@ import app from '../server.js';
 import { ZareRouter } from '../utils/zareRouter.js';
 import { startWatcher } from '../utils/watcher.js';
 import { logger } from '../utils/logger.js';
-import { loadZareConfig } from '../utils/loadZareConfig.js';
 import express from 'express';
 import { getAllFiles } from '../utils/fs.js';
+import { ZareConfig } from 'zare/dist/config.js';
 
 export function serveCommand(program: Command) {
   program
     .command('serve [projectPath]')
     .action(async (projectPath: string = '.') => {
       try {
-        const projectDestination = path.resolve(projectPath);
+        const rootDir = path.resolve(projectPath);
 
         // Check if project directory exist or not
-        if (!(await fs.pathExists(projectDestination))) {
-          logger.error(`Project path does not exists: ${projectDestination}`);
+        if (!(await fs.pathExists(rootDir))) {
+          logger.error(`Project path does not exists: ${rootDir}`);
           process.exit(1);
         }
 
-        if (!(await fs.stat(projectDestination)).isDirectory()) {
-          logger.error(`Project path is not a folder: ${projectDestination}`);
+        if (!(await fs.stat(rootDir)).isDirectory()) {
+          logger.error(`Project path is not a folder: ${rootDir}`);
           process.exit(1);
         }
 
-        const zareConfigurations = await loadZareConfig(projectDestination);
+        const zareConfig = await ZareConfig.find(rootDir);
         const pagesDestination = path.resolve(
-          projectDestination,
-          zareConfigurations.pages!,
+          rootDir,
+          zareConfig.options.pagesDir!,
         );
 
         // pages as views
         app.set('views', pagesDestination);
 
-        (Array.isArray(zareConfigurations.static)
-          ? zareConfigurations.static
-          : [zareConfigurations.static]
-        ).forEach(staticItem => {
-          const staticDest = path.resolve(projectDestination, staticItem!);
+        zareConfig.options.staticDir.forEach(staticItem => {
+          const staticDest = path.resolve(rootDir, staticItem!);
           app.use(express.static(staticDest));
         });
 
@@ -53,7 +50,7 @@ export function serveCommand(program: Command) {
         logger.action('loading files');
         await fileRoutingHandler(pagesDestination);
 
-        const PORT = zareConfigurations.port;
+        const PORT = zareConfig.options.port;
         app.set('port', PORT);
 
         const server = app.listen(PORT, () => {

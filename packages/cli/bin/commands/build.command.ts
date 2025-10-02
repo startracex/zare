@@ -3,12 +3,12 @@ import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
-import { loadZareConfig } from '../utils/loadZareConfig.js';
 import { cpDir, getAllFiles } from '../utils/fs.js';
+import { ZareConfig } from 'zare/dist/config.js';
 
 function generateAllPaths(
   pathTemplate: string,
-  params: Record<string, (string | number)[]> = {},
+  params: Record<string, any> = {},
 ): Record<string, Record<string, string | number>> {
   const paramNames =
     pathTemplate.match(/\[(\w+)\]/g)?.map(match => match.slice(1, -1)) || [];
@@ -45,12 +45,14 @@ async function renderPage(
   pagePath: string,
   outputPath: string,
   renderOptions: Record<string, any> = {},
+  config: ZareConfig,
 ) {
   const fileContent = await fs.readFile(pagePath, 'utf-8');
   const outputHtmlContent = await renderer(
     fileContent,
     renderOptions,
     pagePath,
+    config,
   );
   if (!(await fs.exists(outputPath))) {
     await fs.createFile(outputPath);
@@ -63,23 +65,21 @@ export function buildCommand(program: Command) {
     .command('build [projectPath]')
     .action(async (projectPath: string = '.') => {
       try {
-        const zareConfigurations = await loadZareConfig(
-          path.resolve(projectPath),
-        );
+        const zareConfig = await ZareConfig.find(path.resolve(projectPath));
 
-        const projectDestination = path.resolve(projectPath);
-        const outDir = path.resolve(projectPath, zareConfigurations.outdir!);
+        const rootDir = path.resolve(projectPath);
+        const outDir = path.resolve(projectPath, zareConfig.options.outDir!);
 
         logger.action('checking project destination');
 
         // Check if project directory exist or not
-        if (!(await fs.pathExists(projectDestination))) {
-          logger.error(`Project path does not exists: ${projectDestination}`);
+        if (!(await fs.pathExists(rootDir))) {
+          logger.error(`Project path does not exists: ${rootDir}`);
           process.exit(1);
         }
 
-        if (!(await fs.stat(projectDestination)).isDirectory()) {
-          logger.error(`Project path is not a folder: ${projectDestination}`);
+        if (!(await fs.stat(rootDir)).isDirectory()) {
+          logger.error(`Project path is not a folder: ${rootDir}`);
           process.exit(1);
         }
 
@@ -90,10 +90,7 @@ export function buildCommand(program: Command) {
         }
 
         logger.action('loading pages');
-        const pagesDir = path.join(
-          projectDestination,
-          zareConfigurations.pages!,
-        );
+        const pagesDir = path.join(rootDir, zareConfig.options.pagesDir!);
         const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
           f.toLowerCase().endsWith('.zare'),
         );
@@ -105,23 +102,25 @@ export function buildCommand(program: Command) {
             .replace(/\\/g, '/');
 
           const staticParams = /\[(\w+)\]/.test(fileBaseName)
-            ? await zareConfigurations.generateStaticParams?.(fileBaseName)
+            ? await zareConfig.options.generateStaticParams(fileBaseName)
             : undefined;
 
-          const allPaths = generateAllPaths(fileBaseName, staticParams);
+          const allPaths = generateAllPaths(fileBaseName, staticParams!);
 
           for (const generatedPath in allPaths) {
             const outputPath = path.join(outDir, `${generatedPath}.html`);
-            await renderPage(pagePath, outputPath, {
-              params: allPaths[generatedPath],
-            });
+            await renderPage(
+              pagePath,
+              outputPath,
+              {
+                params: allPaths[generatedPath],
+              },
+              zareConfig,
+            );
           }
         }
         // Copying all included files and folders
-        (Array.isArray(zareConfigurations.static)
-          ? zareConfigurations.static
-          : [zareConfigurations.static]
-        ).forEach(async staticItem => {
+        zareConfig.options.staticDir.forEach(async staticItem => {
           const staticDest = path.resolve(projectPath, staticItem!);
           await fs.mkdir(outDir, { recursive: true });
           await cpDir(staticDest, outDir);

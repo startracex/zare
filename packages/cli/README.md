@@ -70,9 +70,9 @@ Customize your setup using zare.config.js:
 // zare.config.js
 module.exports = {
   port: 8185,
-  static: './static',
-  pages: './pages',
-  outdir: './dist',
+  staticDir: './static',
+  pagesDir: './pages',
+  outDir: './dist',
 };
 ```
 

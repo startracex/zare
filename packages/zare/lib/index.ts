@@ -1,9 +1,7 @@
 import renderer from './core/renderer.js';
 import fs from 'fs';
-import { findUp, isZareConfig } from './utils/shared.js';
-import { dirname, relative, resolve } from 'path';
-import { config } from './config.js';
-import { importModule } from 'tscute';
+import { relative } from 'path';
+import { ZareConfig } from './config.js';
 
 const staticParams = new Map();
 
@@ -12,27 +10,13 @@ export async function __express(
   options: Record<string, any>,
   cb: (err: Error | null, html?: string) => void,
 ) {
-  config.configPath ??=
-    (await findUp(options.settings.views, isZareConfig)) ?? '';
-
-  config.userConfig ??=
-    (config.configPath ? await importModule(config.configPath) : undefined) ??
-    {};
-
-  const staticDirs: string[] = (
-    Array.isArray(config.userConfig.static)
-      ? config.userConfig.static
-      : [config.userConfig.static ?? './static']
-  ).map(s => {
-    return resolve(dirname(config.configPath || process.cwd()), s);
-  });
-  config.userConfig.static = staticDirs;
+  const config = await ZareConfig.find(process.cwd());
 
   const pageRoute =
     '/' + relative(filePath, options.settings.views).replace(/\.zare$/i, '');
   let params = staticParams.get(pageRoute);
   if (!params) {
-    params = (await config.userConfig.generateStaticParams?.(pageRoute)) ?? {};
+    params = (await config.options.generateStaticParams(pageRoute)) ?? {};
   }
   try {
     fs.readFile(filePath, 'utf-8', (err, content) => {
@@ -49,6 +33,7 @@ export async function __express(
             },
           },
           filePath,
+          config,
         );
         cb(null, rendered);
       } catch (renderError) {

@@ -11,7 +11,7 @@ import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
 import { findNodeModules } from '../utils/helper.js';
 import { createRequire } from 'module';
-import { config } from '../config.js';
+import type { ZareConfig } from '../config.js';
 
 const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
@@ -45,6 +45,7 @@ export default class Parser {
   script: Scope;
   functions: Scope;
   filePath: string = '';
+  config!: ZareConfig;
 
   constructor(
     private tokens: Token[],
@@ -246,6 +247,7 @@ export default class Parser {
       undefined,
       this.functions,
     );
+    parser.config = this.config;
     const parsed: string = parser.htmlParser('');
     for (let i = 0; i < arr.length; i++) {
       html += parser.parameterExecuter(parsed, true, {
@@ -480,8 +482,12 @@ export default class Parser {
 
       let resolvedValue = require.resolve(value);
 
-      const staticDirs = config.userConfig!.static! as string[];
-
+      const staticDirs = this.config.options.staticDir;
+      if (!staticDirs.length) {
+        throw new Error(
+          'can not resolve static files without staticDir options',
+        );
+      }
       let staticRelative: string | undefined;
       for (const staticDir of staticDirs) {
         staticRelative = path.relative(staticDir, resolvedValue);
@@ -529,8 +535,12 @@ export default class Parser {
       const require = createRequire(this.filePath || process.cwd());
       let resolvedValue = require.resolve(value);
 
-      const staticDirs = config.userConfig!.static! as string[];
-
+      const staticDirs = this.config.options.staticDir;
+      if (!staticDirs.length) {
+        throw new Error(
+          'can not resolve static files without staticDir options',
+        );
+      }
       let staticRelative: string | undefined;
       for (const staticDir of staticDirs) {
         staticRelative = path.relative(staticDir, resolvedValue);
@@ -665,6 +675,7 @@ export default class Parser {
                   this.linker,
                   this.script,
                 );
+                componentParser.config = this.config;
                 componentParser.filePath = componentPath;
                 this.scope.define(componentName, componentParser);
                 this.eat();
@@ -1046,6 +1057,7 @@ export default class Parser {
           undefined,
           this.functions,
         );
+        slotParser.config = this.config;
         const slotWithParameters = slotParser.htmlParser('');
 
         componentParameters.slot = slotWithParameters;
@@ -1246,6 +1258,7 @@ export default class Parser {
       this.__view,
       this.scope,
     );
+    parser.config = this.config
     return parser.htmlParser(html);
   }
 }
