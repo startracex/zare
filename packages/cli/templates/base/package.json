@@ -1,14 +1,8 @@
 {
   "name": "my-project",
   "version": "0.0.0",
-  "description": "A brief description of the project.",
   "scripts": {
     "serve": "zare serve",
     "build": "zare build"
-  },
-  "keywords": [],
-  "author": "Your Name",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {}
+  }
 }

@@ -2,15 +2,15 @@
   "name": "zare",
   "version": "2.6.1",
   "description": "A file base component template engine",
-  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "node dist/index.js"
   },
   "dependencies": {
-    "turbo": "^2.5.5"
+    "tscute": "^0.4.0"
   },
+  "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json",
@@ -29,5 +29,5 @@
     "type": "git",
     "url": "git+https://github.com/IsmailBinMujeeb/zare.git"
   },
-  "homepage": "https://zare-js.hashnode.space/"
+  "homepage": "https://zare.js.org/"
 }
