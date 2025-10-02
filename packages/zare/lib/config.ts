@@ -7,11 +7,6 @@ import {
   type ZareCoreConfig,
 } from './utils/shared.js';
 
-export const config: {
-  userConfig?: ZareCoreConfig;
-  configPath?: string;
-} = {};
-
 export class ZareConfig {
   static pathFields: string[] = ['staticDir', 'pagesDir', 'outDir'];
   static defaultValues = {
