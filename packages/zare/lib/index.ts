@@ -11,7 +11,11 @@ export async function __express(
   options: Record<string, any>,
   cb: (err: Error | null, html?: string) => void,
 ) {
-  const config = await ZareConfig.find(process.cwd());
+  const settingsConfig = options.settings['zare config'];
+  const config =
+    typeof settingsConfig === 'object'
+      ? settingsConfig
+      : await ZareConfig.find(settingsConfig || process.cwd());
 
   const pageRoute = normalizeRoute(relative(options.settings.views, filePath));
   let params = staticParams.get(pageRoute);

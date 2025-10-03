@@ -15,7 +15,6 @@ export function serveCommand(program: Command) {
     .action(async (projectPath: string = '.') => {
       try {
         const rootDir = path.resolve(projectPath);
-
         // Check if project directory exist or not
         if (!(await fs.pathExists(rootDir))) {
           logger.error(`Project path does not exists: ${rootDir}`);
@@ -35,6 +34,7 @@ export function serveCommand(program: Command) {
 
         // pages as views
         app.set('views', pagesDestination);
+        app.set('zare config', zareConfig);
 
         zareConfig.options.staticDir.forEach(staticItem => {
           const staticDest = path.resolve(rootDir, staticItem!);
