@@ -67,8 +67,11 @@ export function buildCommand(program: Command) {
       try {
         const zareConfig = await ZareConfig.find(path.resolve(projectPath));
 
-        const rootDir = path.resolve(projectPath);
-        const outDir = path.resolve(projectPath, zareConfig.options.outDir!);
+        const rootDir = zareConfig.configDir || projectPath;
+        const outDir = path.resolve(
+          rootDir,
+          zareConfig.options.outDir || 'dist',
+        );
 
         logger.action('checking project destination');
 
@@ -90,7 +93,10 @@ export function buildCommand(program: Command) {
         }
 
         logger.action('loading pages');
-        const pagesDir = path.join(rootDir, zareConfig.options.pagesDir!);
+        const pagesDir = path.resolve(
+          rootDir,
+          zareConfig.options.pagesDir || 'pages',
+        );
         const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
           f.toLowerCase().endsWith('.zare'),
         );
@@ -120,8 +126,7 @@ export function buildCommand(program: Command) {
           }
         }
         // Copying all included files and folders
-        zareConfig.options.staticDir.forEach(async staticItem => {
-          const staticDest = path.resolve(projectPath, staticItem!);
+        zareConfig.options.staticDir.forEach(async staticDest => {
           await fs.mkdir(outDir, { recursive: true });
           await cpDir(staticDest, outDir);
         });
