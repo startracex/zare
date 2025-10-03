@@ -102,31 +102,30 @@ export function buildCommand(program: Command) {
           f.toLowerCase().endsWith('.zare'),
         );
 
-        for (const pagePath of pagePaths) {
-          const pageRoute = normalizeRoute(path.relative(pagesDir, pagePath));
+        await Promise.all(
+          pagePaths.map(async pagePath => {
+            const pageRoute = normalizeRoute(path.relative(pagesDir, pagePath));
 
-          const staticParams =
-            await zareConfig.options.generateStaticParams(pageRoute);
+            const staticParams =
+              await zareConfig.options.generateStaticParams(pageRoute);
+            const allPaths = generateAllPaths(pageRoute, staticParams!);
 
-          const allPaths = generateAllPaths(pageRoute, staticParams!);
-
-          for (const generatedPath in allPaths) {
-            const outputPath = path.join(outDir, `${generatedPath}.html`);
-            await renderPage(
-              pagePath,
-              outputPath,
-              {
-                params: allPaths[generatedPath],
-              },
-              zareConfig,
+            return Promise.all(
+              Object.entries(allPaths).map(async ([generatedPath, params]) => {
+                const outputPath = path.join(outDir, `${generatedPath}.html`);
+                await renderPage(pagePath, outputPath, { params }, zareConfig);
+              }),
             );
-          }
-        }
+          }),
+        );
+
         // Copying all included files and folders
-        zareConfig.options.staticDir.forEach(async staticDest => {
-          await fs.mkdir(outDir, { recursive: true });
-          await cpDir(staticDest, outDir);
-        });
+        await Promise.all(
+          zareConfig.options.staticDir.map(async staticDest => {
+            await fs.mkdir(outDir, { recursive: true });
+            await cpDir(staticDest, outDir);
+          }),
+        );
 
         logger.done('build complete');
       } catch (error) {
