@@ -9,7 +9,15 @@
     ".changeset/*.md",
     "**/_pagefind"
   ],
-  "includes": ["**/*.ts", "**/*.jsx", "**/*.md", "**/*.json"],
+  "includes": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.md",
+    "**/*.mdx",
+    "**/*.json"
+  ],
   "prettier": {
     "semi": true,
     "singleQuote": true,

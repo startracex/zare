@@ -1,13 +1,13 @@
 module.exports = {
   port: 8185,
-  staticDir: "./static",
-  pagesDir: "./pages",
-  outDir: "./dist",
+  staticDir: './static',
+  pagesDir: './pages',
+  outDir: './dist',
   generateStaticParams(path) {
     switch (path) {
-      case "user/[id]":
+      case 'user/[id]':
         return {
-          id: ["zare_user"],
+          id: ['zare_user'],
         };
     }
   },
