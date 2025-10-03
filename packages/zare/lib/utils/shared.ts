@@ -42,3 +42,14 @@ export function mapOrApply<T, U>(
     return callback(value);
   }
 }
+
+export function normalizeRoute(path: string): string {
+  const cleaned = path
+    .replace(/\.zare$/i, '')
+    .replace(/\/index$/, '')
+    .replace(/\\/g, '/');
+  if (cleaned.startsWith('/')) {
+    return cleaned;
+  }
+  return '/' + cleaned;
+}

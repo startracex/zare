@@ -5,6 +5,7 @@ import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
 import { cpDir, getAllFiles } from '../utils/fs.js';
 import { ZareConfig } from 'zare/dist/config.js';
+import { normalizeRoute } from 'zare/dist/utils/shared.js';
 
 function generateAllPaths(
   pathTemplate: string,
@@ -102,16 +103,12 @@ export function buildCommand(program: Command) {
         );
 
         for (const pagePath of pagePaths) {
-          const fileBaseName = path
-            .relative(pagesDir, pagePath)
-            .slice(0, -'.zare'.length)
-            .replace(/\\/g, '/');
+          const pageRoute = normalizeRoute(pagePath);
 
-          const staticParams = /\[(\w+)\]/.test(fileBaseName)
-            ? await zareConfig.options.generateStaticParams(fileBaseName)
-            : undefined;
+          const staticParams =
+            await zareConfig.options.generateStaticParams(pageRoute);
 
-          const allPaths = generateAllPaths(fileBaseName, staticParams!);
+          const allPaths = generateAllPaths(pageRoute, staticParams!);
 
           for (const generatedPath in allPaths) {
             const outputPath = path.join(outDir, `${generatedPath}.html`);

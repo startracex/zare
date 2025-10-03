@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'path';
-import { importModule } from 'tscute';
 import type { OrArray, OrPromise } from './types/token.js';
 import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
+import { pathToFileURL } from 'url';
 
 export interface ZareCoreConfig {
   generateStaticParams: (
@@ -59,7 +59,8 @@ export class ZareConfig {
   static async find(root: string, filter = isZareConfig) {
     const path = await findUp(root, filter);
     if (path) {
-      const values = (await importModule(path))?.default ?? undefined;
+      const fileUrl = pathToFileURL(path).toString();
+      const values = (await import(fileUrl))?.default ?? undefined;
       return new this(dirname(path), values);
     }
     return new this();

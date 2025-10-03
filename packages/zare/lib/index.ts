@@ -2,6 +2,7 @@ import renderer from './core/renderer.js';
 import fs from 'fs';
 import { relative } from 'path';
 import { ZareConfig } from './config.js';
+import { normalizeRoute } from './utils/shared.js';
 
 const staticParams = new Map();
 
@@ -12,8 +13,7 @@ export async function __express(
 ) {
   const config = await ZareConfig.find(process.cwd());
 
-  const pageRoute =
-    '/' + relative(filePath, options.settings.views).replace(/\.zare$/i, '');
+  const pageRoute = normalizeRoute(relative(options.settings.views, filePath));
   let params = staticParams.get(pageRoute);
   if (!params) {
     params = (await config.options.generateStaticParams(pageRoute)) ?? {};
