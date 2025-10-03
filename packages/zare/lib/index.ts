@@ -32,8 +32,8 @@ export async function __express(
           {
             ...options,
             params: {
-              ...options.params,
               ...params,
+              ...options.params,
             },
           },
           filePath,
