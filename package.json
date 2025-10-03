@@ -7,10 +7,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "docs:start": "npm run -w zare-docs dev",
+    "docs:build": "npm run -w zare-docs build",
+    "cli:start": "npm run -w @zarejs/cli dev",
     "test": "vitest run",
-    "docs:start": "cd docs && npm start",
-    "docs:build": "cd docs && npm run build",
-    "cli:start": "cd packages/cli && npm run dev",
     "coverage": "vitest run --coverage",
     "licenses": "node scripts/copy-licenses.js",
     "prepare": "husky",
