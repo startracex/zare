@@ -44,12 +44,12 @@ export function mapOrApply<T, U>(
 }
 
 export function normalizeRoute(path: string): string {
-  const cleaned = path
-    .replace(/\.zare$/i, '')
-    .replace(/\/index$/, '')
-    .replace(/\\/g, '/');
-  if (cleaned.startsWith('/')) {
-    return cleaned;
+  path = path.replace(/\.zare$/i, '').replace(/\\/g, '/');
+  if (!path.startsWith('/')) {
+    path = '/' + path;
   }
-  return '/' + cleaned;
+  if (path === '/index') {
+    return '/';
+  }
+  return path.replace('/index', '');
 }
