@@ -480,9 +480,6 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const require = createRequire(this.filePath || process.cwd());
-      let resolvedValue = require.resolve(value);
-
       /* v8 ignore start */
 
       const staticDirs = this.config.options.staticDir;
@@ -493,9 +490,9 @@ export default class Parser {
       }
       let staticRelative: string | undefined;
       for (const staticDir of staticDirs) {
-        staticRelative = path.relative(staticDir, resolvedValue);
+        staticRelative = path.relative(staticDir, value);
         if (!staticRelative.startsWith('..')) {
-          resolvedValue = '/' + staticRelative.replace(/\\/g, '/');
+          value = '/' + staticRelative.replace(/\\/g, '/');
           break;
         }
       }
@@ -505,7 +502,7 @@ export default class Parser {
 
       /* v8 ignore end */
 
-      const jsScriptTag = `\n<script src="${resolvedValue}" defer/></script>`;
+      const jsScriptTag = `\n<script src="${value}" defer/></script>`;
 
       if (titleTagIndex !== -1) {
         const insertPosition = titleTagIndex + '</title>'.length;
@@ -538,9 +535,6 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const require = createRequire(this.filePath || process.cwd());
-      let resolvedValue = require.resolve(value);
-
       /* v8 ignore start */
 
       const staticDirs = this.config.options.staticDir;
@@ -551,9 +545,9 @@ export default class Parser {
       }
       let staticRelative: string | undefined;
       for (const staticDir of staticDirs) {
-        staticRelative = path.relative(staticDir, resolvedValue);
+        staticRelative = path.relative(staticDir, value);
         if (!staticRelative.startsWith('..')) {
-          resolvedValue = '/' + staticRelative.replace(/\\/g, '/');
+          value = '/' + staticRelative.replace(/\\/g, '/');
           break;
         }
       }
@@ -563,7 +557,7 @@ export default class Parser {
 
       /* v8 ignore end  */
 
-      const cssLinkTag = `\n<link rel="stylesheet" href="${resolvedValue}" />`;
+      const cssLinkTag = `\n<link rel="stylesheet" href="${value}" />`;
 
       if (titleTagIndex !== -1) {
         const insertPosition = titleTagIndex + '</title>'.length;
@@ -732,7 +726,13 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            this.linker.define(cssPath, cssPath);
+            const require = createRequire(this.filePath);
+
+            (this.linker.parent ? this.linker.parent : this.linker).define(
+              cssPath,
+              require.resolve(cssPath),
+            );
+
             this.eat();
           } else
             throw Syntax_Error.toString('Syntax Error', {
@@ -758,9 +758,11 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            /* this.script.parent
-              ? this.script.parent.define(jsPath, jsPath)
-              :  */ this.script.define(jsPath, jsPath);
+            const require = createRequire(this.filePath);
+            (this.script.parent ? this.script.parent : this.script).define(
+              jsPath,
+              require.resolve(jsPath),
+            );
             this.eat();
           } else
             throw Syntax_Error.toString('Syntax Error', {
