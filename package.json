@@ -16,7 +16,7 @@
     "prepare": "husky",
     "changeset": "changeset",
     "format": "dprint fmt",
-    "fmt:check": "dprint check"
+    "format:check": "dprint check"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
