@@ -103,7 +103,7 @@ export function buildCommand(program: Command) {
         );
 
         for (const pagePath of pagePaths) {
-          const pageRoute = normalizeRoute(pagePath);
+          const pageRoute = normalizeRoute(path.relative(pagesDir, pagePath));
 
           const staticParams =
             await zareConfig.options.generateStaticParams(pageRoute);
