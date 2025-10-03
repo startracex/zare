@@ -480,6 +480,7 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
+      const require = createRequire(this.filePath || process.cwd());
       let resolvedValue = require.resolve(value);
 
       /* v8 ignore start */
