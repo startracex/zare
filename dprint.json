@@ -16,7 +16,8 @@
     "**/*.jsx",
     "**/*.md",
     "**/*.mdx",
-    "**/*.json"
+    "**/*.json",
+    "**/*.css"
   ],
   "prettier": {
     "semi": true,

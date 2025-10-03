@@ -9,11 +9,15 @@
 }
 
 .hero::after {
-  content: "";
+  content: '';
   position: absolute;
   height: 100%;
   aspect-ratio: 16 / 9;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0, transparent 70%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.1) 0,
+    transparent 70%
+  );
   z-index: -1;
 }
 
