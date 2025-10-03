@@ -24,6 +24,6 @@ export function startWatcher(path: string, server: Server) {
 async function restartServer(server: Server) {
   server.close();
   app.listen(app.get('port'), () => {
-    logger.info('Server reload');
+    logger.info`server reload`;
   });
 }

@@ -17,12 +17,12 @@ export function serveCommand(program: Command) {
         const rootDir = path.resolve(projectPath);
         // Check if project directory exist or not
         if (!(await fs.pathExists(rootDir))) {
-          logger.error(`Project path does not exists: ${rootDir}`);
+          logger.error`Project path does not exists: ${rootDir}`;
           process.exit(1);
         }
 
         if (!(await fs.stat(rootDir)).isDirectory()) {
-          logger.error(`Project path is not a folder: ${rootDir}`);
+          logger.error`Project path is not a folder: ${rootDir}`;
           process.exit(1);
         }
 
@@ -43,24 +43,24 @@ export function serveCommand(program: Command) {
 
         // Check if project directory exist or not
         if (!(await fs.pathExists(pagesDestination))) {
-          logger.error(`Pages folder does not exists: ${pagesDestination}`);
+          logger.error`Pages folder does not exists: ${pagesDestination}`;
           process.exit(1);
         }
 
-        logger.action('loading files');
+        logger.action`loading files`;
         await fileRoutingHandler(pagesDestination);
 
         const PORT = zareConfig.options.port;
         app.set('port', PORT);
 
         const server = app.listen(PORT, () => {
-          logger.done(`Server is running at http://localhost:${PORT}`);
+          logger.done`Server is running at http://localhost:${PORT}`;
         });
 
         startWatcher(pagesDestination, server);
       } catch (error) {
         if (error instanceof Error)
-          logger.error(`Failed to build project: ${error.message}`);
+          logger.error`Failed to build project: ${error.message}`;
         process.exit(1);
       }
     });

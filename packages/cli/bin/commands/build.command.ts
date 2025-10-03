@@ -74,26 +74,26 @@ export function buildCommand(program: Command) {
           zareConfig.options.outDir || 'dist',
         );
 
-        logger.action('checking project destination');
+        logger.action`checking project destination`;
 
         // Check if project directory exist or not
         if (!(await fs.pathExists(rootDir))) {
-          logger.error(`Project path does not exists: ${rootDir}`);
+          logger.error`Project path does not exists: ${rootDir}`;
           process.exit(1);
         }
 
         if (!(await fs.stat(rootDir)).isDirectory()) {
-          logger.error(`Project path is not a folder: ${rootDir}`);
+          logger.error`Project path is not a folder: ${rootDir}`;
           process.exit(1);
         }
 
         // Check if outdir exist if not create one.
         if (!(await fs.pathExists(outDir))) {
           await fs.mkdir(outDir, { recursive: true });
-          logger.info('output directory created');
+          logger.info`output directory created`;
         }
 
-        logger.action('loading pages');
+        logger.action`loading pages`;
         const pagesDir = path.resolve(
           rootDir,
           zareConfig.options.pagesDir || 'pages',
@@ -127,11 +127,10 @@ export function buildCommand(program: Command) {
           }),
         );
 
-        logger.done('build complete');
+        logger.done`build complete`;
       } catch (error) {
         if (error instanceof Error)
-          logger.error(`Failed to build project: ${error.message}`);
-        else logger.error(`${error}`);
+          logger.error`failed to build project: ${error.message}`;
         process.exit(1);
       }
     });
