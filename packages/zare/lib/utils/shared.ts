@@ -2,16 +2,6 @@ import { dirname, join, resolve } from 'path';
 import { readdir } from 'fs/promises';
 import type { Dirent } from 'fs';
 
-export interface ZareCoreConfig {
-  generateStaticParams: (
-    path?: string,
-  ) => void | OrPromise<Record<string, any>>;
-  staticDir: string[];
-  pagesDir?: string;
-  outDir?: string;
-  port?: number;
-}
-
 export async function findUp(
   root: string,
   filter: (path: string, entry: Dirent<string>) => boolean,
@@ -52,6 +42,3 @@ export function mapOrApply<T, U>(
     return callback(value);
   }
 }
-
-export type OrArray<T> = T | T[];
-export type OrPromise<T> = T | Promise<T>;

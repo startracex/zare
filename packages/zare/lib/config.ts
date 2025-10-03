@@ -1,11 +1,23 @@
-import { importModule } from 'tscute';
 import { dirname, resolve } from 'path';
-import {
-  findUp,
-  isZareConfig,
-  mapOrApply,
-  type ZareCoreConfig,
-} from './utils/shared.js';
+import { importModule } from 'tscute';
+import type { OrArray, OrPromise } from './types/token.js';
+import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
+
+export interface ZareCoreConfig {
+  generateStaticParams: (
+    path?: string,
+  ) => void | OrPromise<Record<string, any>>;
+  staticDir: string[];
+  pagesDir?: string;
+  outDir?: string;
+  port?: number;
+}
+
+export type ZareUserConfig =
+  | ZareCoreConfig
+  | {
+      staticDir: OrArray<string>;
+    };
 
 export class ZareConfig {
   static pathFields: string[] = ['staticDir', 'pagesDir', 'outDir'];
@@ -15,7 +27,7 @@ export class ZareConfig {
     generateStaticParams() {},
   };
 
-  options!: ZareCoreConfig;
+  options: ZareCoreConfig;
   configDir: string = '';
 
   constructor(dir?: string, options: Record<PropertyKey, any> = {}) {
