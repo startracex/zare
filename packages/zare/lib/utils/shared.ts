@@ -51,5 +51,5 @@ export function normalizeRoute(path: string): string {
   if (path === '/index') {
     return '/';
   }
-  return path.replace('/index', '');
+  return path.replace(/\/index$/, '');
 }
