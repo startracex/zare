@@ -1,7 +1,15 @@
 import { dirname, resolve } from 'path';
 import type { OrPromise } from './types/token.js';
 import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { createRequire } from 'module';
+
+const protocolRegex = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\//;
+
+function getProtocol(str: string): string | undefined {
+  const match = str.match(protocolRegex);
+  return match?.[1] ?? undefined;
+}
 
 export class ZareConfig {
   static pathFields: string[] = ['staticDir'];
@@ -42,6 +50,44 @@ export class ZareConfig {
         );
       }
     });
+  }
+
+  resolve(path: string, request: string) {
+    const proto = getProtocol(request);
+    if (proto) {
+      if (proto === 'file') {
+        request = fileURLToPath(request);
+      } else {
+        return request;
+      }
+    }
+    const require = createRequire(path);
+    return require.resolve(request);
+  }
+
+  resolveStatic(path: string, request: string) {
+    const initialRequest = request;
+    const proto = getProtocol(request);
+    if (proto) {
+      if (proto === 'file') {
+        request = fileURLToPath(request);
+      } else {
+        return request;
+      }
+    }
+    const require = createRequire(path);
+    request = require.resolve(request);
+    const { staticDir } = this.options;
+    if (!staticDir.length) {
+      throw new Error('can not resolve static files without staticDir options');
+    }
+
+    for (const s of staticDir) {
+      if (request.startsWith(s)) {
+        return request.slice(s.length).replace(/\\/g, '/');
+      }
+    }
+    throw new Error(`can not resolve static file: ${initialRequest}`);
   }
 
   static async find<T extends ZareConfig>(

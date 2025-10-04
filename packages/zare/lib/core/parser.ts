@@ -480,28 +480,6 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      /* v8 ignore start */
-
-      const staticDirs = this.config.options.staticDir;
-      if (!staticDirs.length) {
-        throw new Error(
-          'can not resolve static files without staticDir options',
-        );
-      }
-      let staticRelative: string | undefined;
-      for (const staticDir of staticDirs) {
-        staticRelative = path.relative(staticDir, value);
-        if (!staticRelative.startsWith('..')) {
-          value = '/' + staticRelative.replace(/\\/g, '/');
-          break;
-        }
-      }
-      if (!staticRelative && staticDirs.length) {
-        throw new Error(`can not resolve static file: ${value}`);
-      }
-
-      /* v8 ignore end */
-
       const jsScriptTag = `\n<script src="${value}" defer/></script>`;
 
       if (titleTagIndex !== -1) {
@@ -534,28 +512,6 @@ export default class Parser {
       }
 
       const titleTagIndex = html.indexOf('</title>');
-
-      /* v8 ignore start */
-
-      const staticDirs = this.config.options.staticDir;
-      if (!staticDirs.length) {
-        throw new Error(
-          'can not resolve static files without staticDir options',
-        );
-      }
-      let staticRelative: string | undefined;
-      for (const staticDir of staticDirs) {
-        staticRelative = path.relative(staticDir, value);
-        if (!staticRelative.startsWith('..')) {
-          value = '/' + staticRelative.replace(/\\/g, '/');
-          break;
-        }
-      }
-      if (!staticRelative && staticDirs.length) {
-        throw new Error(`can not resolve static file: ${value}`);
-      }
-
-      /* v8 ignore end  */
 
       const cssLinkTag = `\n<link rel="stylesheet" href="${value}" />`;
 
@@ -726,11 +682,9 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            const require = createRequire(this.filePath);
-
             (this.linker.parent ? this.linker.parent : this.linker).define(
               cssPath,
-              require.resolve(cssPath),
+              this.config.resolveStatic(this.filePath, cssPath),
             );
 
             this.eat();
@@ -758,10 +712,9 @@ export default class Parser {
               .replace(`"`, '')
               .replace(`"`, '');
 
-            const require = createRequire(this.filePath);
             (this.script.parent ? this.script.parent : this.script).define(
               jsPath,
-              require.resolve(jsPath),
+              this.config.resolveStatic(this.filePath, jsPath),
             );
             this.eat();
           } else
