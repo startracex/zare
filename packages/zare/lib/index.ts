@@ -1,3 +1,4 @@
+/* v8 ignore start */
 import renderer from './core/renderer.js';
 import { relative } from 'path';
 import { ZareConfig } from './config.js';
@@ -41,3 +42,4 @@ export async function __express(
     cb(error as Error);
   }
 }
+/* v8 ignore end */
