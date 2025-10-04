@@ -1,8 +1,8 @@
 import renderer from './core/renderer.js';
-import fs from 'fs';
 import { relative } from 'path';
 import { ZareConfig } from './config.js';
 import { normalizeRoute } from './utils/shared.js';
+import { readFile } from 'fs/promises';
 
 const staticParams = new Map();
 
@@ -23,27 +23,20 @@ export async function __express(
     params = (await config.options.generateStaticParams(pageRoute)) ?? {};
   }
   try {
-    fs.readFile(filePath, 'utf-8', (err, content) => {
-      if (err) return cb(err);
-
-      try {
-        const rendered = renderer(
-          content,
-          {
-            ...options,
-            params: {
-              ...params,
-              ...options.params,
-            },
-          },
-          filePath,
-          config,
-        );
-        cb(null, rendered);
-      } catch (renderError) {
-        cb(renderError as Error);
-      }
-    });
+    const content = await readFile(filePath, 'utf-8');
+    const rendered = renderer(
+      content,
+      {
+        ...options,
+        params: {
+          ...params,
+          ...options.params,
+        },
+      },
+      filePath,
+      config,
+    );
+    cb(null, rendered);
   } catch (error) {
     cb(error as Error);
   }
