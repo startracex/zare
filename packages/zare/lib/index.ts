@@ -13,7 +13,7 @@ export async function __express(
 ) {
   const settingsConfig = options.settings['zare config'];
   const config =
-    typeof settingsConfig === 'object'
+    settingsConfig && typeof settingsConfig === 'object'
       ? settingsConfig
       : await ZareConfig.find(settingsConfig || process.cwd());
 
