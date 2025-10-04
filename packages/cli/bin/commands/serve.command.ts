@@ -7,7 +7,7 @@ import { startWatcher } from '../utils/watcher.js';
 import { logger } from '../utils/logger.js';
 import express from 'express';
 import { getAllFiles } from '../utils/fs.js';
-import { ZareConfig } from 'zare/dist/config.js';
+import { ZareCliConfig as ZareConfig } from '../config.js';
 
 export function serveCommand(program: Command) {
   program
@@ -29,7 +29,7 @@ export function serveCommand(program: Command) {
         const zareConfig = await ZareConfig.find(rootDir);
         const pagesDestination = path.resolve(
           rootDir,
-          zareConfig.options.pagesDir!,
+          zareConfig.options.pagesDir,
         );
 
         // pages as views

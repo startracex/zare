@@ -1,33 +1,21 @@
 import { dirname, resolve } from 'path';
-import type { OrArray, OrPromise } from './types/token.js';
+import type { OrPromise } from './types/token.js';
 import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
 import { pathToFileURL } from 'url';
 
-export interface ZareCoreConfig {
-  generateStaticParams: (
-    path?: string,
-  ) => void | OrPromise<Record<string, any>>;
-  staticDir: string[];
-  pagesDir?: string;
-  outDir?: string;
-  port?: number;
-}
-
-export type ZareUserConfig =
-  | ZareCoreConfig
-  | {
-      staticDir: OrArray<string>;
-    };
-
 export class ZareConfig {
-  static pathFields: string[] = ['staticDir', 'pagesDir', 'outDir'];
+  static pathFields: string[] = ['staticDir'];
   static defaultValues = {
     staticDir: ['static'],
-    pagesDir: 'pages',
     generateStaticParams() {},
   };
 
-  options: ZareCoreConfig;
+  options: {
+    generateStaticParams: (
+      path?: string,
+    ) => void | OrPromise<Record<string, any>>;
+    staticDir: string[];
+  };
   configDir: string = '';
 
   constructor(dir?: string, options: Record<PropertyKey, any> = {}) {
@@ -56,7 +44,11 @@ export class ZareConfig {
     });
   }
 
-  static async find(root: string, filter = isZareConfig) {
+  static async find<T extends ZareConfig>(
+    this: new (...args: any[]) => T,
+    root: string,
+    filter = isZareConfig,
+  ): Promise<T> {
     const path = await findUp(root, filter);
     if (path) {
       const fileUrl = pathToFileURL(path).toString();

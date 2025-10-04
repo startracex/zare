@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
 import renderer from 'zare/dist/core/renderer.js';
 import { cpDir, getAllFiles } from '../utils/fs.js';
-import { ZareConfig } from 'zare/dist/config.js';
+import { ZareCliConfig as ZareConfig } from '../config.js';
 import { normalizeRoute } from 'zare/dist/utils/shared.js';
 
 function generateAllPaths(
@@ -69,10 +69,7 @@ export function buildCommand(program: Command) {
         const zareConfig = await ZareConfig.find(path.resolve(projectPath));
 
         const rootDir = zareConfig.configDir || projectPath;
-        const outDir = path.resolve(
-          rootDir,
-          zareConfig.options.outDir || 'dist',
-        );
+        const outDir = path.resolve(rootDir, zareConfig.options.outDir);
 
         logger.action`checking project destination`;
 
@@ -94,10 +91,7 @@ export function buildCommand(program: Command) {
         }
 
         logger.action`loading pages`;
-        const pagesDir = path.resolve(
-          rootDir,
-          zareConfig.options.pagesDir || 'pages',
-        );
+        const pagesDir = path.resolve(rootDir, zareConfig.options.pagesDir);
         const pagePaths = (await getAllFiles(pagesDir)).filter(f =>
           f.toLowerCase().endsWith('.zare'),
         );
