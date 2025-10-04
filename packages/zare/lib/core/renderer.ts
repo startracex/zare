@@ -18,7 +18,7 @@ export default (
   const parserInstance: Parser = new Parser(
     tokens,
     sanitized,
-    filePath.replace(/[\/\\][^\/\\]+$/, ''),
+    filePath.replace(/[/\\][^/\\]+$/, ''),
   );
   parserInstance.config = config;
   parserInstance.filePath = filePath;
