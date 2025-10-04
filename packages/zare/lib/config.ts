@@ -66,6 +66,9 @@ export class ZareConfig {
   }
 
   resolveStatic(path: string, request: string) {
+    if (request.startsWith('/')) {
+      return request;
+    }
     const initialRequest = request;
     const proto = getProtocol(request);
     if (proto) {
