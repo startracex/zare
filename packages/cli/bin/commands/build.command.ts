@@ -2,10 +2,10 @@ import type { Command } from 'commander';
 import path from 'path';
 import fs from 'fs-extra';
 import { logger } from '../utils/logger.js';
-import renderer from 'zare/dist/core/renderer.js';
+import renderer from 'zare/core/renderer.js';
 import { cpDir, getAllFiles } from '../utils/fs.js';
 import { ZareCliConfig as ZareConfig } from '../config.js';
-import { normalizeRoute } from 'zare/dist/utils/shared.js';
+import { normalizeRoute } from 'zare/utils/shared.js';
 
 function generateAllPaths(
   pathTemplate: string,

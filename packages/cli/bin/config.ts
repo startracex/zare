@@ -1,5 +1,5 @@
-import { ZareConfig } from 'zare/dist/config.js';
-import type { isZareConfig } from 'zare/dist/utils/shared.js';
+import { ZareConfig } from 'zare/config.js';
+import type { isZareConfig } from 'zare/utils/shared.js';
 
 export class ZareCliConfig extends ZareConfig {
   static pathFields: string[] = [

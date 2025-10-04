@@ -10,13 +10,10 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./lib/*": "./lib/*",
-    "./dist/*": "./dist/*",
-    "./*": "./dist/*"
+    "./*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "files": [
-    "lib",
     "dist",
     "CHANGELOG.md"
   ],
