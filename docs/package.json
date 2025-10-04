@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next --turbopack",
-    "postbuild": "pagefind --site .next/server/app --output-path build/_pagefind",
+    "postbuild": "pagefind --site .next/server/app --output-path dist/_pagefind",
     "start": "next start"
   },
   "dependencies": {

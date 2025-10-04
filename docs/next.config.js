@@ -10,7 +10,7 @@ const withNextra = nextra({
 
 export default withNextra({
   output: 'export',
-  distDir: 'build',
+  distDir: 'dist',
   images: {
     unoptimized: true,
   },
