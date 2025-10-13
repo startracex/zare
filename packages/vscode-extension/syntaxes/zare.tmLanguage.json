@@ -1,0 +1,398 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Zare",
+  "scopeName": "source.zare",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#function-expression"
+    },
+    {
+      "include": "#expression-parameters"
+    },
+    {
+      "include": "#html"
+    },
+    {
+      "include": "#javascript"
+    },
+    {
+      "include": "#html-tags"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(as)\\s+(\\w+)\\s+(import)\\s+(\"[^\"]*\")",
+          "captures": {
+            "1": {
+              "name": "keyword.control.zare"
+            },
+            "2": {
+              "name": "entity.name.type.zare"
+            },
+            "3": {
+              "name": "keyword.control.zare"
+            },
+            "4": {
+              "name": "string.quoted.double.zare"
+            }
+          }
+        },
+        {
+          "name": "keyword.control.zare",
+          "match": "\\b(import|link|as)\\b"
+        },
+        {
+          "match": "\\b(use)\\s+(\"[^\"]*\")",
+          "captures": {
+            "1": {
+              "name": "keyword.control.zare"
+            },
+            "2": {
+              "name": "string.quoted.double.zare"
+            }
+          }
+        },
+        {
+          "match": "\\b(use)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.zare"
+            },
+            "2": {
+              "name": "entity.name.type.zare"
+            }
+          }
+        },
+        {
+          "begin": "@(if|else|each)\\b",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.control.zare"
+            }
+          },
+          "end": "(?<=\\})",
+          "patterns": [
+            {
+              "include": "#expression-parameters"
+            },
+            {
+              "begin": "\\{",
+              "end": "\\}",
+              "patterns": [
+                {
+                  "include": "#keywords"
+                },
+                {
+                  "include": "#strings"
+                },
+                {
+                  "include": "#expression-parameters"
+                },
+                {
+                  "include": "#html-tags"
+                },
+                {
+                  "include": "text.html.basic"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.zare",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.zare",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "function-expression": {
+      "patterns": [
+        {
+          "begin": "@(\\w+)\\s*\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.control"
+            },
+            "1": {
+              "name": "entity.name.function.zare"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.parameters.end.zare"
+            }
+          },
+          "name": "meta.function-expression.zare",
+          "patterns": [
+            {
+              "include": "#function-expression"
+            },
+            {
+              "match": "\\b(true|false|null|undefined)\\b",
+              "name": "constant.language.js"
+            },
+            {
+              "match": "\\b\\d+(\\.\\d+)?\\b",
+              "name": "constant.numeric.js"
+            },
+            {
+              "match": "\\b(fn|serve|as|link|import)\\b",
+              "name": "keyword.control.js"
+            },
+            {
+              "begin": "\"",
+              "end": "\"",
+              "name": "string.quoted.double.js",
+              "patterns": [
+                {
+                  "match": "\\\\.",
+                  "name": "constant.character.escape.js"
+                }
+              ]
+            },
+            {
+              "begin": "'",
+              "end": "'",
+              "name": "string.quoted.single.js",
+              "patterns": [
+                {
+                  "match": "\\\\.",
+                  "name": "constant.character.escape.js"
+                }
+              ]
+            },
+            {
+              "match": "\\b[a-zA-Z_$][a-zA-Z0-9_$]*\\b",
+              "name": "variable.parameter.js"
+            },
+            {
+              "match": "[+\\-*/=<>!&|%^~?:]",
+              "name": "keyword.operator.js"
+            },
+            {
+              "match": ",",
+              "name": "punctuation.separator.parameter.js"
+            }
+          ]
+        }
+      ]
+    },
+    "expression-parameters": {
+      "patterns": [
+        {
+          "begin": "@\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.control.zare"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "keyword.operator.expression.zare"
+            }
+          },
+          "name": "meta.expression.parameter.zare",
+          "patterns": [
+            {
+              "match": "\\b(true|false|null|undefined)\\b",
+              "name": "constant.language.js"
+            },
+            {
+              "match": "\\b\\d+(\\.\\d+)?\\b",
+              "name": "constant.numeric.js"
+            },
+            {
+              "match": "\\b(fn|serve|as|link|import)\\b",
+              "name": "keyword.control.js"
+            },
+            {
+              "begin": "\"",
+              "end": "\"",
+              "name": "string.quoted.double.js",
+              "patterns": [
+                {
+                  "match": "\\\\.",
+                  "name": "constant.character.escape.js"
+                }
+              ]
+            },
+            {
+              "begin": "'",
+              "end": "'",
+              "name": "string.quoted.single.js",
+              "patterns": [
+                {
+                  "match": "\\\\.",
+                  "name": "constant.character.escape.js"
+                }
+              ]
+            },
+            {
+              "match": "\\b[a-zA-Z_$][a-zA-Z0-9_$]*\\b",
+              "name": "variable.parameter.js"
+            },
+            {
+              "match": "[+\\-*/=<>!&|%^~?:]",
+              "name": "keyword.operator.js"
+            }
+          ]
+        }
+      ]
+    },
+    "html": {
+      "patterns": [
+        {
+          "begin": "\\b(serve)\\s*\\(",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.serve.zare"
+            }
+          },
+          "end": "\\)|\\z",
+          "name": "meta.embedded.block.serve.zare",
+          "patterns": [
+            {
+              "include": "#function-expression"
+            },
+            {
+              "include": "#keywords"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "include": "#expression-parameters"
+            },
+            {
+              "include": "#html-tags"
+            },
+            {
+              "include": "text.html.basic"
+            }
+          ]
+        }
+      ]
+    },
+    "html-tags": {
+      "patterns": [
+        {
+          "name": "meta.tag.any.html",
+          "begin": "(<)([a-zA-Z][a-zA-Z0-9\\-]*)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.tag.begin.html"
+            },
+            "2": {
+              "name": "entity.name.tag.html"
+            }
+          },
+          "end": "(/>)|((>))",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.tag.end.html"
+            },
+            "3": {
+              "name": "punctuation.definition.tag.end.html"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#html-attributes"
+            }
+          ]
+        },
+        {
+          "name": "meta.tag.any.html",
+          "begin": "(</)([a-zA-Z][a-zA-Z0-9\\-]*)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.definition.tag.begin.html"
+            },
+            "2": {
+              "name": "entity.name.tag.html"
+            }
+          },
+          "end": "(>)",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.definition.tag.end.html"
+            }
+          }
+        }
+      ]
+    },
+    "html-attributes": {
+      "patterns": [
+        {
+          "match": "\\b(class)\\b",
+          "name": "entity.other.attribute-name.class.html"
+        },
+        {
+          "match": "\\b([a-zA-Z\\-:]+)\\b",
+          "name": "entity.other.attribute-name.html"
+        },
+        {
+          "name": "string.quoted.double.html",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.html",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.html",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.html",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "javascript": {
+      "patterns": [
+        {
+          "begin": "\\b(fn)\\s+(\\w+)\\s*\\([^)]*\\)\\s*\\{",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.fn.zare"
+            },
+            "2": {
+              "name": "entity.name.function.zare"
+            }
+          },
+          "end": "\\}",
+          "name": "meta.embedded.block.js.zare",
+          "contentName": "source.js",
+          "patterns": [
+            {
+              "include": "source.js"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

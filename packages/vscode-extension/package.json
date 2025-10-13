@@ -1,0 +1,75 @@
+{
+  "name": "vscode-extension",
+  "displayName": "Zare vs code extension",
+  "description": "VS Code extension for Zare Template Engine",
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "publisher": "IsmailBinMujeeb",
+  "icon": "assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IsmailBinMujeeb/zare"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "zare",
+        "aliases": [
+          "Zare",
+          "zare"
+        ],
+        "extensions": [
+          ".zare"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "zare",
+        "scopeName": "source.zare",
+        "path": "./syntaxes/zare.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html.zare": "html",
+          "meta.embedded.block.js.zare": "javascript",
+          "source.js.embedded.zare": "javascript",
+          "source.js": "javascript",
+          "text.html.basic": "html"
+        }
+      }
+    ],
+    "configurationDefaults": {
+      "[zare]": {
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "zare",
+        "path": "./snippets/zare.code-snippets.json"
+      }
+    ]
+  },
+  "extensionDependencies": [
+    "bradlc.vscode-tailwindcss"
+  ],
+  "devDependencies": {
+    "@types/vscode": "^1.102.0",
+    "vsce": "^2.15.0"
+  }
+}

@@ -1,0 +1,23 @@
+# Ignore node_modules (VSCE handles dependencies)
+node_modules
+
+# Ignore build artifacts outside dist
+dist/**
+
+# Ignore monorepo config
+../../.changeset
+../../.git
+../../.github
+../../node_modules
+../../.husky
+../../.turbo
+
+# Ignore IDE/editor files
+.vscode
+*.code-workspace
+
+# Ignore tests, docs, etc.
+tests
+docs
+coverage
+../../.gitignore

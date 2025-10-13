@@ -1,0 +1,50 @@
+{
+  "Zare Component Import": {
+    "prefix": "zas",
+    "body": ["as ${1:alias} import \"${2:module}\""],
+    "description": "Zare Component import syntax"
+  },
+  "Zare Module Import": {
+    "prefix": "zuse",
+    "body": ["use ${1:module}"],
+    "description": "Zare Module import syntax"
+  },
+  "Zare JavaScript Import": {
+    "prefix": "zjs",
+    "body": ["import \"${1:path}\""],
+    "description": "Zare JavaScript import syntax"
+  },
+  "Zare CSS Link": {
+    "prefix": "zcss",
+    "body": ["link \"${1:path}\""],
+    "description": "Zare CSS link syntax"
+  },
+  "Zare Function": {
+    "prefix": "zfn",
+    "body": ["fn ${1:name}(${2:params}) {", "    $3", "}"],
+    "description": "Function block"
+  },
+  "Zare Serve HTML": {
+    "prefix": "zserve",
+    "body": ["serve (", "    $1", ")"],
+    "description": "Serve block"
+  },
+  "Zare If Statement": {
+    "scope": "text.html.basic, meta.embedded.block.html.zare",
+    "prefix": "zif",
+    "body": ["@if (${1:condition}) {", "   $2", "}"],
+    "description": "Zare if conditional block"
+  },
+  "Zare Else Statement": {
+    "scope": "text.html.basic, meta.embedded.block.html.zare",
+    "prefix": "zelse",
+    "body": ["@else {", "   $1", "}"],
+    "description": "Zare else conditional block"
+  },
+  "Zare Each Statement": {
+    "scope": "text.html.basic, meta.embedded.block.html.zare",
+    "prefix": "zeach",
+    "body": ["@each (${1:array}:${2:element}) {", "   $3", "}"],
+    "description": "Zare each block"
+  }
+}
