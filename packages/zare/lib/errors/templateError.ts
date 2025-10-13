@@ -1,10 +1,9 @@
 export default class Template_Error extends Error {
-  options: {
-    code: string;
-    lineNumber: number;
-    columnNumber: number;
-    filePath: string;
-  };
+  code: string;
+  lineNumber: number;
+  columnNumber: number;
+  filePath: string;
+
   constructor(
     message: string,
     options: {
@@ -15,7 +14,13 @@ export default class Template_Error extends Error {
     },
   ) {
     super(message);
-    this.options = options;
+    this.name = 'TemplateError';
+    this.code = options.code;
+    this.lineNumber = options.lineNumber;
+    this.columnNumber = options.columnNumber;
+    this.filePath = options.filePath;
+
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 
   static toString(
@@ -27,9 +32,12 @@ export default class Template_Error extends Error {
       filePath: string;
       cause: string;
     },
-  ) {
-    new Template_Error(message, options);
-
-    return `Template Error: at file:///${options.filePath.replace(/\s+/g, '%20')}:${options.lineNumber}:${options.columnNumber} ${options.cause}`;
+  ): string {
+    return (
+      `Template Error: ${message}\n` +
+      `  at file:///${options.filePath.replace(/\s+/g, '%20')}:${options.lineNumber}:${options.columnNumber}\n` +
+      `  Cause: ${options.cause}\n` +
+      `  Code: ${options.code}`
+    );
   }
 }
