@@ -11,7 +11,7 @@ export default class Template_Error extends Error {
       lineNumber: number;
       columnNumber: number;
       filePath: string;
-    }
+    },
   ) {
     super(message);
     this.name = 'TemplateError';
@@ -31,12 +31,13 @@ export default class Template_Error extends Error {
       columnNumber: number;
       filePath: string;
       cause: string;
-    }
+    },
   ): string {
-
-    return `Template Error: ${message}\n` +
+    return (
+      `Template Error: ${message}\n` +
       `  at file:///${options.filePath.replace(/\s+/g, '%20')}:${options.lineNumber}:${options.columnNumber}\n` +
       `  Cause: ${options.cause}\n` +
-      `  Code: ${options.code}`;
+      `  Code: ${options.code}`
+    );
   }
 }

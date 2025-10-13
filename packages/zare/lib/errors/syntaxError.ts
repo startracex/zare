@@ -1,12 +1,11 @@
 export default class Syntax_Error extends SyntaxError {
-  options: {
-    code: string;
-    lineNumber: number;
-    columnNumber: number;
-    filePath: string;
-    expectedValue: string;
-    actualValue: string;
-  };
+  code: string;
+  lineNumber: number;
+  columnNumber: number;
+  filePath: string;
+  expectedValue: string;
+  actualValue: string;
+
   constructor(
     message: string,
     options: {
@@ -19,9 +18,16 @@ export default class Syntax_Error extends SyntaxError {
     },
   ) {
     super(message);
+    this.name = 'CustomSyntaxError';
 
-    this.options = options;
-    this.stack = undefined;
+    this.code = options.code;
+    this.lineNumber = options.lineNumber;
+    this.columnNumber = options.columnNumber;
+    this.filePath = options.filePath;
+    this.expectedValue = options.expectedValue;
+    this.actualValue = options.actualValue;
+
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 
   static toString(
@@ -34,9 +40,13 @@ export default class Syntax_Error extends SyntaxError {
       expectedValue: string;
       actualValue: string;
     },
-  ) {
-    new Syntax_Error(message, options);
-
-    return `Syntax Error: at ${options.filePath.replace(' ', '%20')}:${options.lineNumber}:${options.columnNumber} expected ${options.expectedValue} got ${options.actualValue}`;
+  ): string {
+    return (
+      `Syntax Error: ${message}\n` +
+      `  at file:///${options.filePath.replace(/\s+/g, '%20')}:${options.lineNumber}:${options.columnNumber}\n` +
+      `  Expected: ${options.expectedValue}\n` +
+      `  Received: ${options.actualValue}\n` +
+      `  Code: ${options.code}`
+    );
   }
 }
