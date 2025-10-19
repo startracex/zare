@@ -115,3 +115,12 @@ jobs:
           title: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish VS Code Extension
+        if: success() && github.ref == 'refs/heads/main'
+        working-directory: packages/vscode-extension
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+        run: |
+          npm run build
+          npx vsce publish -p $VSCE_PAT
