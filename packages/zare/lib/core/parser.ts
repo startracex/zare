@@ -1094,8 +1094,11 @@ export default class Parser {
           componentParameters[matchParameter[1]] = matchParameter[2];
         }
 
-        const componentHtml =
-          componentParser.updateParameters(componentParameters);
+        const componentHtml = componentParser.updateParameters({
+          ...componentParameters,
+          ...this.parameters,
+          slot: null,
+        });
         html += componentHtml || '';
 
         this.eat();
