@@ -1,0 +1,7 @@
+serve (
+    @if (slot) {
+        @(slot)
+    } @else {
+        Use opening and closing components
+    }
+)

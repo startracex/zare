@@ -355,6 +355,15 @@ describe('Parser', () => {
         const html = render(testCode);
         expect(html.trim()).toBe('<div>fake_name</div>');
       });
+
+      it('should not display slot when using self closing component', () => {
+        const testCode = `
+                as Dummy import "./tests/dummy_views/dummy_slot_self_closing_component"
+                serve (<Dummy/>)`;
+
+        const html = render(testCode);
+        expect(html.trim()).includes('Use opening and closing components');
+      });
     });
 
     describe('opening & closing components', () => {
