@@ -31,7 +31,7 @@ const REGEX_HEAD_TAG = /<head[^>]*>/i;
 const REGEX_PATH_STRING = /"([:.]?[./]?[\w.\-/ ]*)"/;
 const REGEX_CSS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
 const REGEX_JS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
-const REGEX_FN_PARAMS = /^[a-zA-Z0-9.]+$/;
+const REGEX_FN_PARAMS = /^[a-zA-Z0-9_]+$/;
 const REGEX_FN_CALLS_IN_FN_ARGS = /\b([a-zA-Z_]\w*)\s*\(\s*([^()]*?)\s*\)/;
 const REGEX_EACH_EXPRESSION = /\((.*?)\)/;
 
@@ -238,23 +238,23 @@ export default class Parser {
 
     const tokenizer: Lexer = new Lexer(codeBlock, '', true);
     const tokens: Token[] = tokenizer.start();
-    const parser: Parser = new Parser(
-      tokens,
-      { ...this.parameters },
-      this.__view,
-      this.scope,
-      undefined,
-      undefined,
-      this.functions,
-    );
-    parser.config = this.config;
-    const parsed: string = parser.htmlParser('');
     for (let i = 0; i < arr.length; i++) {
-      html += parser.parameterExecuter(parsed, true, {
-        ...this.parameters,
-        [key]: arr[i],
-        _i: i,
-      });
+      const parser: Parser = new Parser(
+        tokens,
+        {
+          ...this.parameters,
+          [key]: arr[i],
+          _i: i,
+        },
+        this.__view,
+        this.scope,
+        undefined,
+        undefined,
+        this.functions,
+      );
+      parser.config = this.config;
+      const parsed: string = parser.htmlParser('');
+      html += parser.parameterExecuter(parsed);
     }
 
     return html;
