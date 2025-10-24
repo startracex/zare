@@ -8,7 +8,7 @@
     "vscode": "^1.102.0"
   },
   "publisher": "IsmailBinMujeeb",
-  "icon": "assets/icon.png",
+  "icon": "public/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/IsmailBinMujeeb/zare"

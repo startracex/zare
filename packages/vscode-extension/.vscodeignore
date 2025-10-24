@@ -11,13 +11,26 @@ dist/**
 ../../node_modules
 ../../.husky
 ../../.turbo
+../../commitlint.config.js
+../../dprint.json
 
 # Ignore IDE/editor files
-.vscode
+../../.vscode/launch.json
 *.code-workspace
 
 # Ignore tests, docs, etc.
 tests
-docs
+../../scripts
+../../docs
+../cli
+../zare
 coverage
 ../../.gitignore
+../../assets
+../../LICENSE
+../../package-lock.json
+../../package.json
+../../README.md
+../../tsconfig.json
+../../turbo.json
+../../vitest.config.ts
