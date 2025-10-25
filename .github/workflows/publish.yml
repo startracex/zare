@@ -123,5 +123,4 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
         run: |
-          npm run build
-          npx vsce publish -p $VSCE_PAT
+          npx vsce publish -p $VSCE_PAT --no-dependencies
