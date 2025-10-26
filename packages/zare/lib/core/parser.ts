@@ -187,21 +187,6 @@ export default class Parser {
         if (!params) return '';
 
         const inner = match.slice(2, -1).trim();
-        let firstValue: string, optionalValue: string;
-
-        if (
-          /^@\(\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\|\|\s*([a-zA-Z_$][a-zA-Z0-9_$]*|["'].*?["'])\s*\)$/.test(
-            match,
-          )
-        ) {
-          firstValue = inner.split('||')?.[0]?.trim();
-          optionalValue = inner.split('||')?.[0]?.trim();
-
-          return (
-            this.getValue(params, firstValue) ||
-            this.getValue(params, optionalValue)
-          );
-        }
         return this.getValue(params, inner);
       });
     } else {
