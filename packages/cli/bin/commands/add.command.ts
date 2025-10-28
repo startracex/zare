@@ -78,8 +78,7 @@ export const addCommand = (program: Command) => {
 
               await Promise.all(
                 zareConfig.options.staticDir.map(async staticItem => {
-                  const depFilePath = path.resolve(
-                    rootDir,
+                  const depFilePath = path.join(
                     staticItem,
                     `/deps/${depFileName}`,
                   );
