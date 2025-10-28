@@ -4,6 +4,7 @@
   "description": "VS Code extension for Zare Template Engine",
   "version": "1.0.0",
   "type": "module",
+  "private": true,
   "engines": {
     "vscode": "^1.102.0"
   },
