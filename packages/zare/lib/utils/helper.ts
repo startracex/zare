@@ -42,19 +42,3 @@ export function sanitizeOptions(
 
   return sanitized;
 }
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export function findNodeModules(startDir = __dirname) {
-  let currentDir = startDir;
-
-  while (currentDir !== path.parse(currentDir).root) {
-    const nodeModulesPath = path.join(currentDir, 'node_modules');
-    if (fs.existsSync(nodeModulesPath)) {
-      return nodeModulesPath;
-    }
-    currentDir = path.dirname(currentDir);
-  }
-
-  return null; // not found
-}

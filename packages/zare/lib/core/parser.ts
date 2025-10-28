@@ -9,7 +9,6 @@ import fs from 'fs';
 import path from 'path';
 import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
-import { findNodeModules } from '../utils/helper.js';
 import { createRequire } from 'module';
 import type { ZareConfig } from '../config.js';
 
@@ -595,9 +594,7 @@ export default class Parser {
                 const componentString = this.currentToken?.value
                   .replace(`"`, '')
                   .replace(`"`, '');
-                const componentDir = componentString.startsWith(':')
-                  ? findNodeModules() || ''
-                  : this.__view;
+                const componentDir = this.__view;
                 let componentPath = path.resolve(
                   componentDir,
                   componentString.replace(':', ''),

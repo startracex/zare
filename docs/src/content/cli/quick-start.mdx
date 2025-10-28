@@ -45,6 +45,22 @@ zare init myapp
 
 Hit enter and it will create a new directory where required files and folders were setup
 
+### Adding Dependencies
+
+```bash
+npx zare add Button
+```
+
+This command will add `Button` component from `ZareUI` (IsmailBinMujeeb/zare/main). You can also add dependencies from other github projects.
+
+#### I DON'T LIKE ZAREUI
+
+```bash
+npx zare add Button USERNAME/REPO/BRANCH [projectDir]
+```
+
+It will add `Button` as a dependency from specified github project. And last option is project path which is "." by default.
+
 ### Start Serving
 
 ```bash
