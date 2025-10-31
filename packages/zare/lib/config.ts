@@ -13,9 +13,10 @@ function getProtocol(str: string): string | undefined {
 }
 
 export class ZareConfig {
-  static pathFields: string[] = ['staticDir'];
+  static pathFields: string[] = ['staticDir', 'pagesDir'];
   static defaultValues = {
     staticDir: ['static'],
+    pagesDir: 'pages',
     generateStaticParams() {},
   };
 
@@ -24,6 +25,7 @@ export class ZareConfig {
       path?: string,
     ) => void | OrPromise<Record<string, any>>;
     staticDir: string[];
+    pagesDir: string;
   };
   configDir: string = '';
 
