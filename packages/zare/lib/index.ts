@@ -1,6 +1,6 @@
 /* v8 ignore start */
 import renderer from './core/renderer.js';
-import { relative } from 'path';
+import { relative, join } from 'path';
 import { ZareConfig } from './config.js';
 import { normalizeRoute } from './utils/shared.js';
 import { readFile } from 'fs/promises';
@@ -42,4 +42,39 @@ export async function __express(
     cb(error as Error);
   }
 }
+
+export const render = async (
+  filePath: string,
+  options: Record<string, any>,
+) => {
+  const config = await ZareConfig.find(process.cwd());
+  const viewsDir = config.options.pagesDir;
+  const templatePath = join(viewsDir, filePath);
+
+  const pageRoute = normalizeRoute(relative(viewsDir, templatePath));
+  let params = staticParams.get(pageRoute);
+  if (!params) {
+    params = (await config.options.generateStaticParams(pageRoute)) ?? {};
+  }
+  try {
+    const content = await readFile(templatePath, 'utf-8');
+    const rendered = renderer(
+      content,
+      {
+        ...options,
+        params: {
+          ...params,
+          ...options.params,
+        },
+      },
+      templatePath,
+      config,
+    );
+
+    return rendered;
+  } catch (error) {
+    return error;
+  }
+};
+
 /* v8 ignore end */
