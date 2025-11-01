@@ -1,5 +1,16 @@
 # zare
 
+## 3.1.0
+
+### Minor Changes
+
+- 05cada1: add render method
+
+### Patch Changes
+
+- 43343ae: removed colon syntax in parser component import
+- f1d8ea2: keep spaces in if condition
+
 ## 3.0.0
 
 ### Major Changes

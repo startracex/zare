@@ -379,11 +379,6 @@ export default class Lexer {
     this.advance();
 
     while (this.currentCharacter && parentCount > 0) {
-      if (WHITESPACE_REGEX.test(this.currentCharacter)) {
-        this.advance();
-        continue;
-      }
-
       if (this.currentCharacter == ')') parentCount--;
       else if (this.currentCharacter == '(') parentCount++;
 
