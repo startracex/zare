@@ -1,5 +1,19 @@
 # @zare/cli
 
+## 1.3.0
+
+### Minor Changes
+
+- a4cfe37: create add command for adding components from registry
+
+### Patch Changes
+
+- ea52300: fix static files conflict
+- Updated dependencies [43343ae]
+- Updated dependencies [05cada1]
+- Updated dependencies [f1d8ea2]
+  - zare@3.1.0
+
 ## 1.2.0
 
 ### Minor Changes
