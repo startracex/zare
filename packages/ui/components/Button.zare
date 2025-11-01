@@ -1,0 +1,5 @@
+serve (
+    <button class="@(zclass) bg-zinc-50 text-zinc-950 hover:bg-zinc-300 rounded cursor-pointer px-2 py-1">
+        @(slot)
+    </button>
+)

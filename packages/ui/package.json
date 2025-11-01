@@ -1,0 +1,21 @@
+{
+  "name": "@zarejs/ui",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "imports": {
+    "#css/*": "./static/css/*",
+    "#js/*": "./static/js/*",
+    "#dist/*": "./static/dist/*"
+  },
+  "scripts": {
+    "serve": "zare serve",
+    "build": "zare build",
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/dist/output.css",
+    "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/dist/output.css --watch"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.16",
+    "tailwindcss": "^4.1.16"
+  }
+}
