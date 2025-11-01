@@ -10,7 +10,6 @@
   },
   "scripts": {
     "serve": "zare serve",
-    "build": "zare build",
     "build:css": "tailwindcss -i ./static/css/input.css -o ./static/dist/output.css",
     "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/dist/output.css --watch"
   },
