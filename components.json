@@ -1,5 +1,5 @@
 {
-    "Button": {
-        "component": "/packages/ui/components/Button.zare"
-    }
+  "Button": {
+    "component": "/packages/ui/components/Button.zare"
+  }
 }
