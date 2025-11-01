@@ -1,3 +1,5 @@
+import { Callout } from 'nextra/components';
+
 # Components
 
 ## Overview
@@ -108,4 +110,7 @@ serve (
 
 Here the `@(title)` will replace with `Lorem Ipsum` and `@(slot)` will replace the content written between open and closing component tags.
 
-**\*NOTE: <mark>You can’t use any parameter in replace of </mark>**`@(slot)`**<mark> it is the parameter to access Childs in components otherwise it will throw </mark>**`undefined`
+<Callout type="important">
+  You can’t use any parameter in replace of **`@(slot)`** it is the parameter to
+  access Childs in components otherwise it will display `undefined` or `Null`
+</Callout>

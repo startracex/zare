@@ -36,7 +36,7 @@ Here is a minimal example of how you can link css with Base templates
 
 ```zare filename="/views/pages/index.zare"
 as Base import "../base"
-link "/css/index" # will be ./public/css/index.css
+link "/css/index.js" # will be ./public/css/index.css
 
 serve (
     <Base title="Button">
@@ -50,6 +50,7 @@ And as mention above your template must have a head tag.
 ```zare filename="/views/base.zare"
 
 serve (
+        <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8"/>

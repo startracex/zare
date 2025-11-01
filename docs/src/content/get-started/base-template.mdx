@@ -1,3 +1,5 @@
+import { Callout } from 'nextra/components';
+
 # Base Template
 
 The Base Templates are normal components you just wrap your page code in this Base Component.
@@ -11,26 +13,23 @@ Here is a complete example code of a Base Template that have a dynamic title for
 ```zare filename="/views/base.zare"
 
 serve (
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>@(title)</title>
-        </head>
-        <body>
-            @(slot)
-        </body>
-        </html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>@(title)</title>
+    </head>
+    <body>
+        @(slot)
+    </body>
+    </html>
 )
 ```
 
-### Notes
-
-- You can’t use Doctype tag in `v1` it will throw error we will handle it in `v2`.
-
-- You can’t use `style` and `script` tag in any Zare file it is not supported yet but you can use `linking css` and `importing vanilla js` statements which is explained here.
-
-- `@(slot)` parameter is necessary without it your code will not shown.
+<Callout type="error">
+  `@(slot)` parameter is necessary without it your code will not shown.
+</Callout>
 
 Now the Page code that will use the above template.
 
