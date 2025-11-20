@@ -277,6 +277,23 @@ describe('Lexical Analysis', () => {
     ]);
   });
 
+  it('should tokenize multiline openning tag', () => {
+    const testCode = `<div
+    classname="m-2"
+    onclick="callable">`;
+    const tokens = tokenizer(testCode);
+    console.log(tokens);
+    expect(tokens).toEqual([
+      {
+        type: TOKEN_TYPES.OPENINGTAG,
+        value: testCode,
+        line: 3,
+        column: 24,
+        filePath: dummyFilPath,
+      },
+    ]);
+  });
+
   it('should tokenize closing tag', () => {
     const testCode = `</div>`;
     const tokens = tokenizer(testCode);
