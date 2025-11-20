@@ -488,8 +488,6 @@ export default class Lexer {
         columnNumber: col,
         filePath: this.filePath,
       });
-    eachExpression += this.currentCharacter;
-    this.advance();
 
     tokens.push({
       type: TOKEN_TYPES.EACHEXPRESSION,

@@ -520,6 +520,12 @@ describe('Parser', () => {
 
       expect(html).toBe('012');
     });
+
+    it('should parse the forEach statement with spaces', () => {
+      const testCode = `serve (@each(arr:a){@(_i)})`;
+      const html = render(testCode, { arr: ['v1', 'v2', 'v3'] });
+      expect(html).toBe('012');
+    });
   });
 
   it('should handle unknown character', () => {
