@@ -282,7 +282,7 @@ describe('Lexical Analysis', () => {
     classname="m-2"
     onclick="callable">`;
     const tokens = tokenizer(testCode);
-    console.log(tokens);
+
     expect(tokens).toEqual([
       {
         type: TOKEN_TYPES.OPENINGTAG,
@@ -319,6 +319,24 @@ describe('Lexical Analysis', () => {
         value: testCode,
         line: 1,
         column: 5,
+        filePath: dummyFilPath,
+      },
+    ]);
+  });
+
+  it('should tokenize multiline self closing tag', () => {
+    const testCode = `<Button
+    class="text-red-500"
+    onclick="clickable"/>`;
+
+    const tokens = tokenizer(testCode);
+
+    expect(tokens).toEqual([
+      {
+        type: TOKEN_TYPES.SELFCLOSINGTAG,
+        value: testCode,
+        line: 3,
+        column: 26,
         filePath: dummyFilPath,
       },
     ]);

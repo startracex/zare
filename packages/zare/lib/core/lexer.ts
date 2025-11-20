@@ -6,7 +6,7 @@ import Template_Error from '../errors/templateError.js';
 const WHITESPACE_REGEX: RegExp = /[\t\n\r\f\v ]/;
 const DOCTYPE_REGEX = /^<!DOCTYPE.*>$/;
 const CLOSINGTAG_REGEX = /^<\/.*>$/;
-const SELFCLOSINGTAG_REGEX = /^<.*\/>$/;
+const SELFCLOSINGTAG_REGEX = /^<[\s\S]*\/>$/;
 const OPENINGTAG_REGEX = /^<[\s\S]*>$/;
 const FUNCTION_CALL_REGEX = /@([a-zA-Z0-9]+)\(([^)]*)\)/;
 const PARAMETERS_REGEX = /^@\(.*\)$/;
