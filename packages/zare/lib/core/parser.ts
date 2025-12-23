@@ -16,9 +16,9 @@ const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
 const REGEX_SINGLE_QUOTE_KEY = /\['(.*?)'\]/g;
 const REGEX_FUNCTION_CALL = /[a-zA-Z0-9_]+\(([\s\S]*?)\)/g;
-const REGEX_PARAMETER_EXPRESSION = /[a-zA-Z0-9]+/g;
 const REGEX_FN_CALL_EXTRACT = /@([a-zA-Z0-9_]+)\(([\s\S]*)\)/;
-const REGEX_COMPONENT_ATTR = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+const REGEX_COMPONENT_ATTR =
+  /([a-zA-Z0-9_-]+)\s*=\s*(?:"([^"]*)"|@\(([^)]*)\))/g;
 const REGEX_OPENING_TAG = /^<([a-zA-Z0-9_-]+)([^>]*)\/?>/;
 const REGEX_CLOSING_TAG = /^<\/([a-zA-Z0-9_-]+)>/;
 const REGEX_SELF_CLOSING_TAG = /^<([^\s>/]+)/;
@@ -190,7 +190,6 @@ export default class Parser {
       });
     } else {
       if (!this.parameters) return '';
-
       return this.getValue(this.parameters, html);
     }
   }
@@ -964,7 +963,14 @@ export default class Parser {
         while (
           (matchParameter = attrRegex.exec(rawAttributes || '')) !== null
         ) {
-          componentParameters[matchParameter[1]] = matchParameter[2];
+          if (matchParameter[2]) {
+            componentParameters[matchParameter[1]] = matchParameter[2];
+          } else if (matchParameter[3]) {
+            componentParameters[matchParameter[1]] = this.parameterExecuter(
+              matchParameter[3],
+              false,
+            );
+          }
         }
 
         const line = this.currentToken.line,
@@ -1073,7 +1079,14 @@ export default class Parser {
         while (
           (matchParameter = attrRegex.exec(componentSplitValue || '')) !== null
         ) {
-          componentParameters[matchParameter[1]] = matchParameter[2];
+          if (matchParameter[2]) {
+            componentParameters[matchParameter[1]] = matchParameter[2];
+          } else if (matchParameter[3]) {
+            componentParameters[matchParameter[1]] = this.parameterExecuter(
+              matchParameter[3],
+              false,
+            );
+          }
         }
 
         const componentHtml = componentParser.updateParameters({

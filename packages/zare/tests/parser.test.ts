@@ -130,7 +130,7 @@ describe('Parser', () => {
                 <title>Dummy</title>
             </head>
             <body>
-                
+
             </body>
             </html>`;
 
@@ -168,7 +168,7 @@ describe('Parser', () => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </head>
             <body>
-                
+
             </body>
             </html>`;
 
@@ -193,7 +193,7 @@ describe('Parser', () => {
                 <title>Dummy</title>
             </head>
             <body>
-                
+
             </body>
             </html>`;
 
@@ -232,7 +232,7 @@ describe('Parser', () => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             </head>
             <body>
-                
+
             </body>
             </html>`;
 
@@ -308,7 +308,7 @@ describe('Parser', () => {
             fn concat (a, b) {
                 return a + b;
             }
-                
+
             serve (@concat("a", "b"))`;
 
       const html = render(testCode);
@@ -356,6 +356,15 @@ describe('Parser', () => {
         expect(html.trim()).toBe('<div>fake_name</div>');
       });
 
+      it('should display parameters as attributes in self closing component', () => {
+        const testCode = `
+                as Dummy import "./tests/dummy_views/dummy_param_attr"
+                serve (<Dummy user=@(data)/>)`;
+
+        const html = render(testCode, { data: { name: 'fake_name' } });
+        expect(html.trim()).toBe('<div>fake_name</div>');
+      });
+
       it('should not display slot when using self closing component', () => {
         const testCode = `
                 as Dummy import "./tests/dummy_views/dummy_slot_self_closing_component"
@@ -382,6 +391,16 @@ describe('Parser', () => {
                 serve (<Dummy name="fake_name"></Dummy>)`;
 
         const html = render(testCode);
+        expect(html.trim()).toBe('<div>fake_name</div>');
+      });
+
+      it('should display parameter attributes in opening & closing component', () => {
+        const testCode = `
+                as Dummy import "./tests/dummy_views/dummy_param_attr.zare"
+                serve (<Dummy user=@(data)></Dummy>)`;
+
+        const html = render(testCode, { data: { name: 'fake_name' } });
+        console.log(html);
         expect(html.trim()).toBe('<div>fake_name</div>');
       });
 
