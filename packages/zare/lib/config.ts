@@ -5,6 +5,9 @@ import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { createRequire } from 'module';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const protocolRegex = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\//;
 
 function getProtocol(str: string): string | undefined {
