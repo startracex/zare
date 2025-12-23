@@ -1,5 +1,5 @@
 /* v8 ignore start */
-import { dirname, resolve } from 'path';
+import path, { dirname, resolve } from 'path';
 import type { OrPromise } from './types/token.js';
 import { findUp, isZareConfig, mapOrApply } from './utils/shared.js';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -13,10 +13,11 @@ function getProtocol(str: string): string | undefined {
 }
 
 export class ZareConfig {
-  static pathFields: string[] = ['staticDir', 'pagesDir'];
+  static pathFields: string[] = ['staticDir', 'pagesDir', 'alias'];
   static defaultValues = {
     staticDir: ['static'],
     pagesDir: 'pages',
+    alias: path.resolve(__dirname),
     generateStaticParams() {},
   };
 
@@ -26,6 +27,7 @@ export class ZareConfig {
     ) => void | OrPromise<Record<string, any>>;
     staticDir: string[];
     pagesDir: string;
+    alias: string;
   };
   configDir: string = '';
 

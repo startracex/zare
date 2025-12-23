@@ -10,7 +10,7 @@ import path from 'path';
 import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
 import { createRequire } from 'module';
-import type { ZareConfig } from '../config.js';
+import { ZareConfig } from '../config.js';
 
 const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
@@ -27,7 +27,7 @@ const REGEX_SCRIPT_TAG = /^<script.*>$/;
 const REGEX_END_STYLE_TAG = /^<\/.*style>$/;
 const REGEX_END_SCRIPT_TAG = /^<\/.*script>$/;
 const REGEX_HEAD_TAG = /<head[^>]*>/i;
-const REGEX_PATH_STRING = /"([:.]?[./]?[\w.\-/ ]*)"/;
+const REGEX_PATH_STRING = /"([@.]?[./]?[\w.\-/ ]*)"/;
 const REGEX_CSS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
 const REGEX_JS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
 const REGEX_FN_PARAMS = /^[a-zA-Z0-9_]+$/;
@@ -590,14 +590,19 @@ export default class Parser {
                 this.currentToken?.type == TOKEN_TYPES.STRING &&
                 REGEX_PATH_STRING.test(this.currentToken?.value)
               ) {
-                const componentString = this.currentToken?.value
+                let componentString = this.currentToken?.value
                   .replace(`"`, '')
                   .replace(`"`, '');
+
+                if (componentString.startsWith('@/')) {
+                  componentString = path.resolve(
+                    ZareConfig.defaultValues.alias,
+                    componentString.replace('@/', ''),
+                  );
+                }
+
                 const componentDir = this.__view;
-                let componentPath = path.resolve(
-                  componentDir,
-                  componentString.replace(':', ''),
-                );
+                let componentPath = path.resolve(componentDir, componentString);
                 componentPath = componentPath.endsWith('.zare')
                   ? componentPath
                   : `${componentPath}.zare`;

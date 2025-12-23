@@ -400,7 +400,6 @@ describe('Parser', () => {
                 serve (<Dummy user=@(data)></Dummy>)`;
 
         const html = render(testCode, { data: { name: 'fake_name' } });
-        console.log(html);
         expect(html.trim()).toBe('<div>fake_name</div>');
       });
 
