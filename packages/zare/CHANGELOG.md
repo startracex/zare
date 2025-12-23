@@ -1,5 +1,11 @@
 # zare
 
+## 3.2.0
+
+### Minor Changes
+
+- c29c074: add support for direct parameters in attributes, e.g. <Dummy name=@(user)/>
+
 ## 3.1.1
 
 ### Patch Changes
