@@ -1,5 +1,11 @@
 # zare
 
+## 3.3.0
+
+### Minor Changes
+
+- d059c17: add support import alias
+
 ## 3.2.0
 
 ### Minor Changes
