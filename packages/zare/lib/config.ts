@@ -1,7 +1,7 @@
 /* v8 ignore start */
 import { dirname, resolve } from 'path';
 import type { OrPromise } from './types/token.js';
-import { findUp, isZareConfig } from './utils/shared.js';
+import { findUp, isZareConfig, toSlash } from './utils/shared.js';
 import { pathToFileURL } from 'url';
 import { ResolverFactory, type NapiResolveOptions } from 'oxc-resolver';
 
@@ -103,7 +103,7 @@ export class ZareConfig {
 
     for (const s of staticDir) {
       if (resolved.startsWith(s)) {
-        return resolved.slice(s.length).replace(/\\/g, '/');
+        return toSlash(resolved.slice(s.length));
       }
     }
     throw new Error(`can not resolve static file: ${request}`);
