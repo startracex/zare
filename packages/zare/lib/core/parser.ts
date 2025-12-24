@@ -596,7 +596,7 @@ export default class Parser {
 
                 if (componentString.startsWith('@/')) {
                   componentString = path.resolve(
-                    ZareConfig.defaultValues.alias,
+                    this.config.options.alias,
                     componentString.replace('@/', ''),
                   );
                 }
