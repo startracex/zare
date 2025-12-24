@@ -46,4 +46,4 @@ export function normalizeRoute(path: string): string {
   }
   return path.replace(/\/index$/, '');
 }
-/* v8 ignore end */
+/* v8 ignore stop */

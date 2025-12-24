@@ -123,4 +123,4 @@ export class ZareConfig {
     return new this();
   }
 }
-/* v8 ignore end */
+/* v8 ignore stop */
