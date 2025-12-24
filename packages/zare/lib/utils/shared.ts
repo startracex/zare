@@ -1,4 +1,3 @@
-/* v8 ignore start */
 import { dirname, join, resolve, sep } from 'path';
 import { readdir } from 'fs/promises';
 import type { Dirent } from 'fs';
@@ -46,4 +45,3 @@ export function normalizeRoute(path: string): string {
   }
   return path.replace(/\/index$/, '');
 }
-/* v8 ignore end */

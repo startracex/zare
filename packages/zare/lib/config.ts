@@ -1,4 +1,3 @@
-/* v8 ignore start */
 import { dirname, resolve } from 'path';
 import type { OrPromise } from './types/token.js';
 import { findUp, isZareConfig, toSlash } from './utils/shared.js';
@@ -123,4 +122,3 @@ export class ZareConfig {
     return new this();
   }
 }
-/* v8 ignore end */

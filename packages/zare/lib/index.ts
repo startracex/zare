@@ -1,4 +1,3 @@
-/* v8 ignore start */
 import renderer from './core/renderer.js';
 import { relative, join } from 'path';
 import { ZareConfig } from './config.js';
@@ -76,5 +75,3 @@ export const render = async (
     return error;
   }
 };
-
-/* v8 ignore end */
