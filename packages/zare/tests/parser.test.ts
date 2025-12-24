@@ -204,9 +204,7 @@ describe('Parser', () => {
 
       const parser = setParser(testCode);
       const html = parser.linkStatic(testHtml);
-      expect(html).includes(
-        `<script src="virtual://dummy.js" defer/></script>`,
-      );
+      expect(html).includes(`<script src="virtual://dummy.js" defer></script>`);
     });
 
     it('should throw head tag not found error for importing js', () => {
@@ -244,7 +242,7 @@ describe('Parser', () => {
       const parser = setParser(testCode);
       const html = parser.linkStatic(testHtml);
 
-      expect(html).includes(`<script src="virtual://dummy" defer/></script>`);
+      expect(html).includes(`<script src="virtual://dummy" defer></script>`);
     });
   });
 
