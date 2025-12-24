@@ -9,8 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import Syntax_Error from '../errors/syntaxError.js';
 import Template_Error from '../errors/templateError.js';
-import { createRequire } from 'module';
-import { ZareConfig } from '../config.js';
+import type { ZareConfig } from '../config.js';
 
 const REGEX_ARRAY_INDEX = /\[(\w+)\]/g;
 const REGEX_DOUBLE_QUOTE_KEY = /\["(.*?)"\]/g;
