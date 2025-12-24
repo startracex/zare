@@ -1,7 +1,10 @@
 /* v8 ignore start */
-import { dirname, join, resolve } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 import { readdir } from 'fs/promises';
 import type { Dirent } from 'fs';
+
+export const toSlash: (s: string) => string =
+  sep === '/' ? s => s : s => s.replace(/\\/g, '/');
 
 export async function findUp(
   root: string,
@@ -34,7 +37,7 @@ export function isZareConfig(_: string, entry: Dirent<string>) {
 }
 
 export function normalizeRoute(path: string): string {
-  path = path.replace(/\.zare$/i, '').replace(/\\/g, '/');
+  path = toSlash(path.replace(/\.zare$/i, ''));
   if (!path.startsWith('/')) {
     path = '/' + path;
   }
