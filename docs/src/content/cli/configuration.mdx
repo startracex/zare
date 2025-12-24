@@ -19,6 +19,10 @@ Static file directory, or an array containing multiple static directories. By de
 
 This directory will contains **views** files. By default, it's `./pages`.
 
+### `alias` - folder path
+
+The alias which will be used to resolve import paths, e.g. `as Base import "@/base"`. By default, it's `path.resolve(__dirname)`.
+
 ### `generateStaticParams`
 
 The `generateStaticParams` function generates static parameter values for dynamic routes.
