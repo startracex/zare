@@ -33,17 +33,6 @@ export function isZareConfig(_: string, entry: Dirent<string>) {
   return /zare\.config\.(js|ts|mts|cts|mjs|cjs)$/i.test(entry.name);
 }
 
-export function mapOrApply<T, U>(
-  value: T | T[],
-  callback: (item: T) => U,
-): U | U[] {
-  if (Array.isArray(value)) {
-    return value.map(callback);
-  } else {
-    return callback(value);
-  }
-}
-
 export function normalizeRoute(path: string): string {
   path = path.replace(/\.zare$/i, '').replace(/\\/g, '/');
   if (!path.startsWith('/')) {

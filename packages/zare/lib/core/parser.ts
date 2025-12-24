@@ -28,8 +28,10 @@ const REGEX_END_STYLE_TAG = /^<\/.*style>$/;
 const REGEX_END_SCRIPT_TAG = /^<\/.*script>$/;
 const REGEX_HEAD_TAG = /<head[^>]*>/i;
 const REGEX_PATH_STRING = /"([@.]?[./]?[\w.\-/ ]*)"/;
-const REGEX_CSS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
-const REGEX_JS_PATH = /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|#|\.\.?\/|\/).*"$/;
+const REGEX_CSS_PATH =
+  /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|@|#|\.\.?\/|\/|[a-z]).*"$/;
+const REGEX_JS_PATH =
+  /^"(([a-zA-Z][a-zA-Z0-9+.-]*):\/\/|@|#|\.\.?\/|\/|[a-z]).*"$/;
 const REGEX_FN_PARAMS = /^[a-zA-Z0-9_]+$/;
 const REGEX_FN_CALLS_IN_FN_ARGS = /\b([a-zA-Z_]\w*)\s*\(\s*([^()]*?)\s*\)/;
 const REGEX_EACH_EXPRESSION = /\((.*?)\)/;
@@ -594,12 +596,10 @@ export default class Parser {
                   .replace(`"`, '')
                   .replace(`"`, '');
 
-                if (componentString.startsWith('@/')) {
-                  componentString = path.resolve(
-                    this.config.options.alias,
-                    componentString.replace('@/', ''),
-                  );
-                }
+                componentString = this.config.resolve(
+                  this.filePath,
+                  componentString,
+                );
 
                 const componentDir = this.__view;
                 let componentPath = path.resolve(componentDir, componentString);
