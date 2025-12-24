@@ -463,7 +463,7 @@ export default class Parser {
 
       const titleTagIndex = html.indexOf('</title>');
 
-      const jsScriptTag = `\n<script src="${value}" defer/></script>`;
+      const jsScriptTag = `\n<script src="${value}" defer></script>`;
 
       if (titleTagIndex !== -1) {
         const insertPosition = titleTagIndex + '</title>'.length;
