@@ -106,7 +106,10 @@ export function buildCommand(program: Command) {
 
             return Promise.all(
               Object.entries(allPaths).map(async ([generatedPath, params]) => {
-                const outputPath = path.join(outDir, `${generatedPath}.html`);
+                const outputPath = path.join(
+                  outDir,
+                  `${generatedPath == '/' ? 'index' : generatedPath}.html`,
+                );
                 await renderPage(pagePath, outputPath, { params }, zareConfig);
               }),
             );
