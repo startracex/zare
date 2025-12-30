@@ -1,9 +1,9 @@
 export type Token = {
-    type: string,
-    value: string,
-    line: number,
-    column: number,
-    filePath: string
+  type: string;
+  value: string;
+  line: number;
+  column: number;
+  filePath: string;
 };
 
 export type OrArray<T> = T | T[];

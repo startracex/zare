@@ -9,12 +9,10 @@
 ## Features
 
 - **Syntax Highlighting**
-
   - Full grammar support for `.zare` source files
   - Token-based coloring for keywords, expressions, functions, operators, strings, comments, etc.
 
 - **Code Snippets**
-
   - Predefined templates for commonly used Zare constructs (functions, control flow, modules, etc.)
   - Smart tab stops and placeholder logic to accelerate coding
 
