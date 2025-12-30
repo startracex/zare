@@ -1,40 +1,57 @@
 # Configuration Reference
 
-> You can edit `zare.config.js` file to change the server configurations
+## `zare.config.js`
 
-### `port` - number
+The configuration file supports `.js`, `.mjs`, `.cts` extensions.
 
-By default the server will listen on `8185`, But this can be change by modifying `port` in the configurations.
+For `.ts`, `.cts`, `.mts`, runtime TypeScript support is required.
 
-### `outDir` - folder path
+### `port`
 
-This directory will contains the static **HTML** files. By default, it's `./dist`
-[Reference](quick-start.mdx#build-html)
+The port number used when listening.
 
-### `staticDir` - folder path(s)
+Default value: `8185`
 
-Static file directory, or an array containing multiple static directories. By default, it's `./static`.
+### `outDir`
 
-### `pagesDir` - folder path
+Output files directory, contains HTML and static files, see [Quick Start](quick-start.mdx#build-html).
 
-This directory will contains **views** files. By default, it's `./pages`.
+Default value: `"dist"`
+
+### `staticDir`
+
+Static files directory, or an array containing one or multiple static directories.
+
+Default value: `["static"]`
+
+### `pagesDir`
+
+View files directory; Zare will build routes based on the file tree.
+
+Default value: `"pages"`
 
 ### `alias`
 
 The "alias" is used to resolve import paths.
 
-Similar to `tsconfig.compilerOptions.paths`; see [TSConfig Reference](https://www.typescriptlang.org/tsconfig/#paths).
+Similar to `tsconfig.compilerOptions.paths`, see [TSConfig Reference](https://www.typescriptlang.org/tsconfig/#paths).
+
+Default value:
+
+```json
+{
+  "@/*": ["./*"]
+}
+```
 
 ### `generateStaticParams`
 
 The `generateStaticParams` function generates static parameter values for dynamic routes.
 
-#### Type Declaration
+Type Declaration:
 
 ```ts
 interface IZareConfig {
-  generateStaticParams?: (
-    path?: string,
-  ) => Record<string, any> | Promise<Record<string, any>>;
+  generateStaticParams?: (path?: string) => Record<string, any> | Promise<Record<string, any>>;
 }
 ```
