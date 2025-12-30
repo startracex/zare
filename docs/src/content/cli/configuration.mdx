@@ -19,9 +19,11 @@ Static file directory, or an array containing multiple static directories. By de
 
 This directory will contains **views** files. By default, it's `./pages`.
 
-### `alias` - folder path
+### `alias`
 
-The alias which will be used to resolve import paths, e.g. `as Base import "@/base"`. By default, it's `path.resolve(__dirname)`.
+The "alias" is used to resolve import paths.
+
+Similar to `tsconfig.compilerOptions.paths`; see [TSConfig Reference](https://www.typescriptlang.org/tsconfig/#paths).
 
 ### `generateStaticParams`
 
