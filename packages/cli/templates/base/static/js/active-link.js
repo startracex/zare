@@ -17,7 +17,8 @@ class ActiveLink extends HTMLElement {
       }
       a.active {
         text-decoration: underline;
-      }`);
+      }
+`);
     this.shadowRoot.adoptedStyleSheets.push(styleSheet);
     const a = document.createElement('a');
     const slot = document.createElement('slot');
@@ -28,7 +29,6 @@ class ActiveLink extends HTMLElement {
 
   connectedCallback() {
     this.href = this.getAttribute('href') || '';
-    this.updateLink();
     this.checkActiveState();
     window.addEventListener('popstate', this.checkActiveState);
   }
@@ -40,36 +40,38 @@ class ActiveLink extends HTMLElement {
   attributeChangedCallback(name, oldVal, newVal) {
     if (name === 'href' && oldVal !== newVal) {
       this.href = newVal || '';
-      this.updateLink();
       this.checkActiveState();
     }
   }
 
-  updateLink() {
-    this.linkElement.href = this.href;
+  set href(v) {
+    this.setAttribute('href', v);
+    this.linkElement.href = v;
   }
 
-  checkActiveState = () => {
+  get href() {
+    return this.linkElement.href;
+  }
+
+  checkActiveState() {
     if (!this.href || this.href.trim() === '' || this.href === '#') {
       this.linkElement.classList.remove('active');
       return;
     }
 
     try {
-      const currentUrl = new URL(window.location.href);
-      const linkUrl = new URL(this.linkElement.href, window.location.origin);
+      const currentUrl = location;
+      const targetUrl = new URL(this.linkElement.href, currentUrl.origin);
       const isActive =
         currentUrl.pathname + currentUrl.search ===
-        linkUrl.pathname + linkUrl.search;
+        targetUrl.pathname + targetUrl.search;
       this.linkElement.classList.toggle('active', isActive);
     } catch {
       this.linkElement.classList.remove('active');
     }
-  };
+  }
 }
 
-const name = 'active-link';
-
-if (!customElements.get(name)) {
-  customElements.define(name, ActiveLink);
+if (!customElements.get('active-link')) {
+  customElements.define('active-link', ActiveLink);
 }
