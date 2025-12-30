@@ -1,5 +1,6 @@
 export default {
   intro: '',
+  config: '',
   'template-engine': '',
   'hello-world': '',
   'file-structure': 'Files Structure',
