@@ -1,4 +1,4 @@
-as Base import "../base"
+as Base import "@/base"
 link "#css/index.css"
 
 serve (

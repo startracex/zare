@@ -1,6 +1,6 @@
 link "#css/global.css"
-as Header import "./components/header"
-as Footer import "./components/footer"
+as Header import "@/components/header"
+as Footer import "@/components/footer"
 
 serve (
     <!DOCTYPE html>
