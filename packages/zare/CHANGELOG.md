@@ -1,5 +1,16 @@
 # zare
 
+## 3.4.0
+
+### Minor Changes
+
+- be35bf7: enhance import resolving
+
+### Patch Changes
+
+- 002a06b: Fix the alias error not supporting with zare config
+- 40b9c07: Fix unexpected / after defer in dist script tag
+
 ## 3.3.1
 
 ### Patch Changes
