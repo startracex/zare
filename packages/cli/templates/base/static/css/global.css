@@ -57,20 +57,6 @@ footer {
   border-top: 1px solid var(--split);
 }
 
-a {
-  display: inline-block;
-  color: currentColor;
-  text-decoration: none;
-}
-
-.link:hover {
-  color: var(--hover);
-}
-
-.link.active {
-  text-decoration: underline;
-}
-
 .button {
   padding: 0.375rem 0.75rem;
   text-decoration: none;

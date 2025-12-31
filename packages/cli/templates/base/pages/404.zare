@@ -1,18 +1,9 @@
-as Base import "../base"
+as Base import "@/base"
 link "#css/404.css"
 
 serve (
     <Base>
         <div class="not-found">
-            <p><h1></h1></p>
-            <i><h1></h1></i>
-
-            <p></p>
-            <h1></h1>
-            <p></p>
-
-            <i><h1></h1></i>
-
             <h2>404</h2>
             <p>Page not found.</p>
             <a href="/" class="button">Back to homepage</a>
